@@ -1,7 +1,6 @@
 # MCValidation
 Files:
-test_geometry3D.py - main code that contained the relavent code to perform lab tests. Or at least to get the required number of emitted photons for a desired number of p.e. in the camera
-
+get_photons.py reads in a run list and provides the required number of photons emitted in LightEmission package to obtain the desired p.e. level
 ![input pe](Figures/inputTruepe.png)
 
 
