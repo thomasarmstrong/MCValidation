@@ -95,11 +95,16 @@ class ChargeResolutionGenerator(Tool):
         plot_cam = False
         plot_delay = 0.5
         disp = None
+        n_events=[]
+        trig_eff=[]
 
+        n_pe = []
         if debug:
             fig=plt.figure(1)
             ax=fig.add_subplot(111)
         for n, run in enumerate(run_list[0]):
+            n_events.append(run_list[3][n])
+            n_pe.append(run_list[2][n])
             # TODO remove need for hardcoded file name
             if self.calibrator == "TargetIOR1Calibrator":
                 file_name = "%s/Run%05d_r1.tio" % (self.input_path, int(run))
@@ -113,55 +118,61 @@ class ChargeResolutionGenerator(Tool):
                 true_pe = []
                 # lab_pe = []
                 peds_all = []
+                n_trig = 0
                 for event in tqdm(source):
-                    self.cal.calibrate(event)
-                    self.dl0.reduce(event)
-                    self.dl1.calibrate(event)
-                    input_pe = run_list[2][n]
-                    try:
-                        input_nsb = run_list[5][n]
-                    except IndexError:
-                        print('File has no column for NSB, setting to 0')
-                        input_nsb = 0
-                    if self.plot_cam == True:
-                        if disp is None:
-                            geom = event.inst.subarray.tel[self.telescopes].camera
-                            disp = CameraDisplay(geom)
-                            disp.add_colorbar()
-                            plt.show(block=False)
-                        im = event.dl1.tel[self.telescopes].image[0]
-                        disp.image = im
-                        plt.pause(plot_delay)
-
-                    teldata = event.r0.tel[self.telescopes].waveform[0]
-                    peds = teldata[:, 0:10].mean(axis=1)
-                    peds2 = teldata[:, 0:10].std(axis=1)
-                    peds_all.append(teldata[:, 0:90])
-                    # plt.hist(peds,bins=50, alpha=0.4)
-                    # plt.show()
-                    # print(teldata)
-                    # plt.plot(range(len(teldata[100])), teldata[100])
-                    # plt.show()
-                    # exit()
-                # print(np.mean(peds_all), np.std(peds_all))
-                # exit()
-                    # true_charge_mc = event.mc.tel[self.telescopes].photo_electron_image
-                    # measured_charge = event.dl1.tel[self.telescopes].image[0]
-                    # true_charge_lab = np.asarray([input_pe]*len(measured_charge))
-                    # true_pe.append(true_charge_mc)
-                    # if self.use_true_pe:
-                    #     true_charge=true_charge_mc
-                    # else:
-                    #     true_charge=true_charge_lab.astype(int)
-                    #
-                    # self.calculator.add_charges(true_charge, measured_charge)
-
-                if debug:
-                    # plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all),color='k')
-                    plt.scatter(input_nsb, np.std(peds_all), marker ='x',color='k')
+                    n_trig =+ 1
+                    # true_pe.append()
+                #     self.cal.calibrate(event)
+                #     self.dl0.reduce(event)
+                #     self.dl1.calibrate(event)
+                #     input_pe = run_list[2][n]
+                #     try:
+                #         input_nsb = run_list[5][n]
+                #     except IndexError:
+                #         print('File has no column for NSB, setting to 0')
+                #         input_nsb = 0
+                #     if self.plot_cam == True:
+                #         if disp is None:
+                #             geom = event.inst.subarray.tel[self.telescopes].camera
+                #             disp = CameraDisplay(geom)
+                #             disp.add_colorbar()
+                #             plt.show(block=False)
+                #         im = event.dl1.tel[self.telescopes].image[0]
+                #         disp.image = im
+                #         plt.pause(plot_delay)
+                #
+                #     teldata = event.r0.tel[self.telescopes].waveform[0]
+                #     peds = teldata[:, 0:10].mean(axis=1)
+                #     peds2 = teldata[:, 0:10].std(axis=1)
+                #     peds_all.append(teldata[:, 0:90])
+                #     # plt.hist(peds,bins=50, alpha=0.4)
+                #     # plt.show()
+                #     # print(teldata)
+                #     # plt.plot(range(len(teldata[100])), teldata[100])
+                #     # plt.show()
+                #     # exit()
+                # # print(np.mean(peds_all), np.std(peds_all))
+                # # exit()
+                #     # true_charge_mc = event.mc.tel[self.telescopes].photo_electron_image
+                #     # measured_charge = event.dl1.tel[self.telescopes].image[0]
+                #     # true_charge_lab = np.asarray([input_pe]*len(measured_charge))
+                #     # true_pe.append(true_charge_mc)
+                #     # if self.use_true_pe:
+                #     #     true_charge=true_charge_mc
+                #     # else:
+                #     #     true_charge=true_charge_lab.astype(int)
+                #     #
+                #     # self.calculator.add_charges(true_charge, measured_charge)
+                #
+                # if debug:
+                #     # plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all),color='k')
+                #     plt.scatter(input_nsb, np.std(peds_all), marker ='x',color='k')
             except FileNotFoundError:
                 stop=0
                 print('file_not_found')
+            trig_eff.append(n_trig/run_list[3][n])
+
+        plt.plot(n_pe, trig_eff )
         plt.show()
         if debug:
             plt.xscale('log')
