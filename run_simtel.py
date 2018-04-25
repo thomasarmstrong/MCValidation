@@ -82,6 +82,11 @@ def main():
 
     args = parser.parse_args()
 
+    if not os.path.isdir(args.outdir):
+        os.makedirs(args.outdir)
+        os.makedirs('%s/corsika/' % (args.outdir))
+        os.makedirs('%s/sim_tel/' % (args.outdir))
+
     runN    = None
     pe      = None
     photons = None
