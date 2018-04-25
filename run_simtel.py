@@ -31,7 +31,7 @@ def make_mask(on_pixels, cam_file, out_file):
         else:
             out_file.write(line)
 
-def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thresh= 230,
+def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thresh= 230, extra_ops= ' ',
                infile = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
 	os.system('%s/bin/sim_telarray '
 			  '-c /%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg '
@@ -43,9 +43,10 @@ def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thr
               '-C trigger_telescopes=1 '
               '-C MIN_PHOTONS=0 '
               '-C MIN_PHOTOELECTRONS=0 '
+              '%s '
 			  '-I%s/cfg/CTA/ '
 			  '-I%s '
-			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, simtel_path, corsika_path, infile))
+			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, extra_ops, simtel_path, corsika_path, infile))
 
 def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30,
                       ang_dist = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
@@ -78,6 +79,7 @@ def main():
     parser.add_argument('--cfg', default='/%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg' % simtel_path, help='sim_telarray configuration file')
     parser.add_argument('--nsb', default=0, help='level of non-pulsed background light [MHz]')
     parser.add_argument('--discthresh', default=0, help='level of discriminator threshold, 0 for external trigger')
+    parser.add_argument('--extra_opts', default=' ', help='extra options for simtelarray, each must have -C proceeding')
     parser.add_argument('--only_pixels', default=None, help='list of pixels to have turned on')
 
     args = parser.parse_args()
@@ -108,7 +110,7 @@ def main():
                               distance=args.distance, cam_radius=args.camradius,)
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
-            run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh)
+            run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_ops=args.extra_ops)
 
 if __name__ == '__main__':
     main()
