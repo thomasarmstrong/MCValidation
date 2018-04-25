@@ -59,6 +59,9 @@ def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius
               '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, out_file))
 def main():
 
+
+    if not os.path.isdir(simtel_path) or not os.path.isdir(simtel_path) or not os.path.isdir(lightEmission_path):
+        print('Need to set paths (hardcoded!)')
     # cam_file = open('/scratch/armstrongt/Software/CTA/CorsikaSimtel/2017-12-08_testing/sim_telarray/cfg/CTA/camera_CHEC-S_GATE.dat', 'r')
     # out_file = open('/scratch/armstrongt/Software/CTA/CorsikaSimtel/2017-12-08_testing/sim_telarray/cfg/CTA/camera_CHEC-S_GATE_masked.dat', 'w')
 
@@ -66,12 +69,12 @@ def main():
     parser.add_argument('--infile', default='./runlist.txt', help='File containing run number, Npe and Nphotons')
     parser.add_argument('--outdir', default= '/scratch/armstrongt/Workspace/CTA/MCValidation/data')
     parser.add_argument('--nevents', default=1, help='Number of events to run at each illumination')
-    parser.add_argument('--runLightEmission', type=bool, action='store_true', default=False, help='Run Light Emission Package')
+    parser.add_argument('--runLightEmission', action='store_true', default=False, help='Run Light Emission Package')
     parser.add_argument('--angdist', default='/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
                         help='file containing the angular distribution of the light source')
     parser.add_argument('--distance', default='100', help='distance of lightsource from detector [cm]')
     parser.add_argument('--camradius', default='30', help='radius of the fiducial sphere that contains the detector [cm]')
-    parser.add_argument('--runSimTelarray', type=bool, action='store_true', default=False, help='Run Simtelarray')
+    parser.add_argument('--runSimTelarray', action='store_true', default=False, help='Run Simtelarray')
     parser.add_argument('--cfg', default='/%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg' % simtel_path, help='sim_telarray configuration file')
     parser.add_argument('--nsb', default=0, help='level of non-pulsed background light [MHz]')
     parser.add_argument('--discthresh', default=0, help='level of discriminator threshold, 0 for external trigger')
