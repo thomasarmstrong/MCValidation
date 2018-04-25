@@ -31,7 +31,7 @@ def make_mask(on_pixels, cam_file, out_file):
         else:
             out_file.write(line)
 
-def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thresh= 230, extra_ops= ' ',
+def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thresh= 230, extra_opts= ' ',
                infile = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
 	os.system('%s/bin/sim_telarray '
 			  '-c /%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg '
@@ -46,7 +46,7 @@ def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thr
               '%s '
 			  '-I%s/cfg/CTA/ '
 			  '-I%s '
-			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, extra_ops, simtel_path, corsika_path, infile))
+			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, extra_opts, simtel_path, corsika_path, infile))
 
 def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30,
                       ang_dist = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
@@ -110,7 +110,7 @@ def main():
                               distance=args.distance, cam_radius=args.camradius,)
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
-            run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_ops=args.extra_ops)
+            run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
 
 if __name__ == '__main__':
     main()
