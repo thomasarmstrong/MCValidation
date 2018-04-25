@@ -45,7 +45,7 @@ def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thr
               '-C MIN_PHOTOELECTRONS=0 '
 			  '-I%s/cfg/CTA/ '
 			  '-I%s '
-			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, infile, simtel_path, corsika_path))
+			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, simtel_path, corsika_path, infile))
 
 def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30,
                       ang_dist = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
