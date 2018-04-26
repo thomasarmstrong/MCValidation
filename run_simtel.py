@@ -48,7 +48,7 @@ def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thr
 			  '-I%s '
 			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, extra_opts, simtel_path, corsika_path, infile))
 
-def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30, xdisp=0, ydisp=0,
+def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30, xdisp=0, ydisp=0, spectrum=405,
                       ang_dist = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
                       out_file = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
     os.system('%s/ff-1m '
@@ -57,8 +57,9 @@ def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius
               '--distance %s '
               '--camera-radius %s '
               '--angular-distribution %s '
+              '--spectrum %s '
               '--xy %s,%s '
-              '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, xdisp, ydisp, out_file))
+              '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, spectrum, xdisp, ydisp, out_file))
 def main():
 
 
@@ -74,6 +75,7 @@ def main():
     parser.add_argument('--runLightEmission', action='store_true', default=False, help='Run Light Emission Package')
     parser.add_argument('--angdist', default='/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
                         help='file containing the angular distribution of the light source')
+    parser.add_argument('--spec', default=405, help='spectrum of the light source (filename or value)')
     parser.add_argument('--distance', default='100', help='distance of lightsource from detector [cm]')
     parser.add_argument('--camradius', default='30', help='radius of the fiducial sphere that contains the detector [cm]')
     parser.add_argument('--xdisp', default=0, help='displacement of the light source in the x direction')
