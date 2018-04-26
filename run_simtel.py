@@ -48,7 +48,7 @@ def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thr
 			  '-I%s '
 			  '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, extra_opts, simtel_path, corsika_path, infile))
 
-def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30,
+def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius = 30, xdisp=0, ydisp=0,
                       ang_dist = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
                       out_file = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
     os.system('%s/ff-1m '
@@ -57,7 +57,8 @@ def run_lightemission(events = 3, photons = 10946249, distance = 100, cam_radius
               '--distance %s '
               '--camera-radius %s '
               '--angular-distribution %s '
-              '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, out_file))
+              '--xy %s,%s '
+              '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, xdisp, ydisp, out_file))
 def main():
 
 
@@ -75,6 +76,8 @@ def main():
                         help='file containing the angular distribution of the light source')
     parser.add_argument('--distance', default='100', help='distance of lightsource from detector [cm]')
     parser.add_argument('--camradius', default='30', help='radius of the fiducial sphere that contains the detector [cm]')
+    parser.add_argument('--xdisp', default=0, help='displacement of the light source in the x direction')
+    parser.add_argument('--ydisp', default=0, help='displacement of the light source in the y direction')
     parser.add_argument('--runSimTelarray', action='store_true', default=False, help='Run Simtelarray')
     parser.add_argument('--cfg', default='/%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg' % simtel_path, help='sim_telarray configuration file')
     parser.add_argument('--nsb', default=0, help='level of non-pulsed background light [MHz]')
@@ -107,7 +110,7 @@ def main():
             print("@@@@ Running LightEmission Package\n\n")
             run_lightemission(events=args.nevents, photons = photons[n],
                               out_file=infl, ang_dist=args.angdist,
-                              distance=args.distance, cam_radius=args.camradius,)
+                              distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
             run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
