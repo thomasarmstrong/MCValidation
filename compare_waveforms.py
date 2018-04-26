@@ -30,9 +30,6 @@ ax2.set_title('MC data')
 ax2.set_ylabel('amplitude')
 ax2.set_xlabel('time [ns]')
 
-# filename_r1 = "/Users/armstrongt/Workspace/CTA/MCValidation/data/single_module/target/data_0_5_35_r1.tio"
-# filename_mc = "/Users/armstrongt/Workspace/CTA/MCValidation/data/single_module/sim_tel/run0035.simtel.gz"
-
 ######### CAMERA DATA p.e. ###########
 cal = CameraCalibrator(r1_product="TargetioR1Calibrator")
 try:

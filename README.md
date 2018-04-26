@@ -12,6 +12,9 @@ example run:
 python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 --runLightEmission --angdist ./angular_distribution.dat
 --distance 100 --camradius 30 --runSimTelarray --nsb 0 --discthresh 0
 
+compare_waveforms.py - simple script to view waveforms in parallel for lab and MC
+
+![example waveform](Figures/compare_waveform.png)
 
 exctract_charge_resolution.py 
 
