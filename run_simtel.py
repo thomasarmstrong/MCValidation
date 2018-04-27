@@ -105,17 +105,29 @@ def main():
     except FileNotFoundError:
         print('No such input file, please specify one with --infile FILE')
 
-    for n, p in enumerate(pe):
-        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[n]))
-        outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN[n]))
+    try:
+        for n, p in enumerate(pe):
+            infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[n]))
+            outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN[n]))
+            if args.runLightEmission:
+                print("@@@@ Running LightEmission Package\n\n")
+                run_lightemission(events=args.nevents, photons = photons[n],
+                                  out_file=infl, ang_dist=args.angdist,
+                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+            if args.runSimTelarray:
+                print("@@@@ Running Simtelarray\n\n")
+                run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+    except TypeError:
+        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN))
+        outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN))
         if args.runLightEmission:
             print("@@@@ Running LightEmission Package\n\n")
-            run_lightemission(events=args.nevents, photons = photons[n],
+            run_lightemission(events=args.nevents, photons=photons,
                               out_file=infl, ang_dist=args.angdist,
                               distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
-            run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+            run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
 
 if __name__ == '__main__':
     main()
