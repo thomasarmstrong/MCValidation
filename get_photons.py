@@ -51,29 +51,49 @@ def PolyArea(x,y):
 
 class Geometry:
     def __init__(self):
+        # TODO Make this more flexible for lab setup
         self.fig = plt.figure(1,figsize=(7, 7))
         self.ax = self.fig.add_subplot(111)
-
-
-        # TODO Make this more flexible for lab setup
-
         self.required_pe = 100
         self.camera = "CHEC"
-        self.geom = CameraGeometry.from_name("CHEC")
-        self.npix = len(self.geom.pix_id)
-        self.total_scale = np.ones(self.npix)
-        self.pixel_mask = np.ones(self.npix)
         self.camera_curve_center_x = 1
         self.camera_curve_center_y = 0
         self.camera_curve_radius = 1
-        # self.pixel_pos = np.load("/Users/armstrongt/Software/CTA/CHECsoft/CHECAnalysis/targetpipe/targetpipe/io/checm_pixel_pos.npy")
-        self.pix_size = np.sqrt(self.geom.pix_area[0]).value
+        self.total_scale = 0
+        self.pixel_mask = 0
+        self.ang_dist_file_string = "ang_dist_2.dat"
+        self.geom = None
+        self.npix = 0
+        self.pix_size = None
+        self.fiducial_center = None
+        self.lightsource_distance = None
         self.fiducial_radius = 0.2
-        self.fiducial_center = self.camera_curve_center_x + self.camera_curve_radius * np.cos(np.pi) # This is a little confusing, is it going to be set up to change the position of the lightsource
         self.lightsource_distance = 1
         self.lightsource_x = 0
         self.lightsource_y = 0
-        self.ang_dist_file = np.loadtxt("ang_dist_2.dat", unpack=True)
+        self.ang_dist_file = None
+        self.lightsource_angle = None
+        self.lightsource_sa = None
+        self.fiducial_sa = None
+        self.fiducial_percent = None
+        self.pix_sa = None
+        self.pix_percent = None
+        self.lamda = None
+        self.pde = None
+        self.photons_pixel = None
+        self.photons_ls = None
+        self.photons_fiducial = None
+
+    def setup_geom(self):
+
+        self.geom = CameraGeometry.from_name(self.camera)
+        self.npix = len(self.geom.pix_id)
+        self.total_scale = np.ones(self.npix)
+        self.pixel_mask = np.ones(self.npix)
+        # self.pixel_pos = np.load("/Users/armstrongt/Software/CTA/CHECsoft/CHECAnalysis/targetpipe/targetpipe/io/checm_pixel_pos.npy")
+        self.pix_size = np.sqrt(self.geom.pix_area[0]).value
+        self.fiducial_center = self.camera_curve_center_x + self.camera_curve_radius * np.cos(np.pi) # This is a little confusing, is it going to be set up to change the position of the lightsource
+        self.ang_dist_file = np.loadtxt(self.ang_dist_file_string, unpack=True)
         theta_f = np.pi / 2 - np.arccos(self.fiducial_radius / self.lightsource_distance)
         # theta_ls = theta_f#self.lightsource_angle * np.pi / 180
         theta_p = np.arctan(self.pix_size / (2 * self.lightsource_distance))
@@ -254,7 +274,6 @@ class Geometry:
 
         lim = max(self.geom.pix_x).value
 
-
         ax1.set_ylim3d(-lim, lim)
         ax1.set_zlim3d(-lim, lim)
         ax1.set_xlabel('Z')
@@ -375,46 +394,62 @@ class Geometry:
         return 0
 
 
-
-
 def main():
 
     print('WARNING THIS NEEDS WORK, mostly hardcoded')
     parser = argparse.ArgumentParser(description='Get number of photons for LightEmission package for a requested p.e. per pixel')
     parser.add_argument('--runfile', help='Path to runfile that contains run number and requested/estimated p.e.')
     parser.add_argument('--pdefile', help='Path to PDE file, used to obtain efficiency at given wavelength')
-    parser.add_argument('--transmission', help='Path to additional transmission file, used to obtain efficiency at given wavelength')
+    parser.add_argument('--transmission', help='Path to additional transmission file, used to obtain efficiency at given wavelength', default=None)
     parser.add_argument('--wavelength', default=405, type=float, help='wavelength of lightsource used')
     parser.add_argument('--camera', default="CHEC", help='ctapipe camera geometery to use')
+    parser.add_argument('--ls_distance', default=1, type=float, help='distance of lightsource to camera focal plane [m]')
+    parser.add_argument('--angular_distribution', default="ang_dist_2.dat", help='file containing angular distribution')
     args = parser.parse_args()
 
     # To convert range of desired pe to Lightsource values
-    fl = np.loadtxt(args.runfile, unpack=True)
-    pde = np.loadtxt(args.pdefile,unpack=True)
-    fpde = interp1d(pde[0], pde[1])
-    trans = np.loadtxt(args.transmission, unpack=True)
-    ftrans = interp1d(trans[0], trans[1])
+    try:
+        fl = np.loadtxt(args.runfile, unpack=True)
+        pe = fl[2]
+        run = fl[0]
+    except OSError:
+        pe = [float(args.runfile)]
+        run =[1]
 
-    tote_trans = fpde(args.wavelength) * ftrans(args.wavelength)
-    print(tote_trans)
-    exit()
-
-    g = Geometry(camera = args.camera)
-    # pe = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 35, 37, 40, 43, 46, 49, 53, 57, 61, 65, 70, 75, 81, 86, 93, 100, 107, 114, 123, 132, 141, 151, 162, 174, 187, 200, 215, 231, 247, 265, 284, 305, 327, 351, 376, 403, 432, 464, 497, 533, 572, 613, 657, 705, 756, 811, 869, 932, 1000]
-    # pe = [   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   12, 14,   16,   19,   22,   25,   29,   33,   39,   44,   51,   59, 68,   79,   91,  104,  120,  138,  159,  184,  212,  244,  281, 323,  372,  429,  494,  568,  655,  754,  868, 1000]
-    pe = fl[2]
     ph = []
     pe2 =[]
-    run = []
+    # run = []
+
+    pde = np.loadtxt(args.pdefile,unpack=True)
+    fpde = interp1d(pde[0], pde[1])
+    if args.transmission != None:
+        trans = np.loadtxt(args.transmission, unpack=True)
+        ftrans = interp1d(trans[0], trans[1])
+
+        tote_trans = fpde(args.wavelength) * ftrans(args.wavelength)
+    else:
+        tote_trans = fpde(args.wavelength)
+
+    # print(tote_trans)
+    # exit()
+
+    g = Geometry()
+    g.lightsource_distance = args.ls_distance
+    g.ang_dist_file_string = args.angular_distribution
+    g.camera = args.camera
+    g.setup_geom()
+    # pe = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 35, 37, 40, 43, 46, 49, 53, 57, 61, 65, 70, 75, 81, 86, 93, 100, 107, 114, 123, 132, 141, 151, 162, 174, 187, 200, 215, 231, 247, 265, 284, 305, 327, 351, 376, 403, 432, 464, 497, 533, 572, 613, 657, 705, 756, 811, 869, 932, 1000]
+    # pe = [   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   12, 14,   16,   19,   22,   25,   29,   33,   39,   44,   51,   59, 68,   79,   91,  104,  120,  138,  159,  184,  212,  244,  281, 323,  372,  429,  494,  568,  655,  754,  868, 1000]
+
     for n,i in enumerate(pe):
         # g.required_pe = i
         photons = g.set_illumination(i, tote_trans)
         # print(i, ' ', photons)
         ph.append(round(photons,2))
         pe2.append(round(i,2))
-        run.append(int(fl[0][n]))
+        # run.append(int(fl[0][n]))
         # g.getscale(plot=False)
-    print('number of photoelectrons')
+    print('number of requested photoelectrons')
     print(pe2)
     print('number of required emitted photons')
     print(ph)

@@ -116,7 +116,10 @@ def main():
                                   distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
             if args.runSimTelarray:
                 print("@@@@ Running Simtelarray\n\n")
-                run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+                if args.discthresh=="File":
+                    run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=infile[3][n], extra_opts=args.extra_opts)
+                else:
+                    run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
     except TypeError:
         infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN))
         outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN))
@@ -127,7 +130,10 @@ def main():
                               distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
-            run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+            if args.discthresh == "File":
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[3], extra_opts=args.extra_opts)
+            else:
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
 
 if __name__ == '__main__':
     main()
