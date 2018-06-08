@@ -3,9 +3,9 @@ import argparse
 import numpy as np
 
 ## Hardcoded parameters:
-simtel_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2017-12-08_testing/sim_telarray'
-corsika_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2017-12-08_testing/corsika-6990/run'
-lightEmission_path = '/scratch/armstrongt/Workspace/CTA/MCValidation/src/LightEmission-pkg'
+simtel_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-03-01_testing/sim_telarray'
+corsika_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-03-01_testing/corsika-6990/run'
+lightEmission_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-03-01_testing/LightEmission'
 
 ## old
 pe = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 19, 22, 25, 29, 33, 39, 44, 51, 59, 68, 79, 91, 104, 120, 138,159, 184, 212, 244, 281, 323, 372, 429, 494, 568, 655, 754, 868, 1000]
