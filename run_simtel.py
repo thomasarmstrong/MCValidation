@@ -33,7 +33,7 @@ def make_mask(on_pixels, cam_file, out_file):
 
 def run_simtel(outfile ='../data/bypass2_enoise.simtel.gz', nsb = 0.02, disc_thresh= 230, extra_opts= ' ',
                infile = '/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
-	os.system('%s/bin/sim_telarray '
+	os.system('%s/sim_telarray '
 			  '-c /%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg '
 			  '-o %s '
 			  '-C BYPASS_OPTICS=2 '
