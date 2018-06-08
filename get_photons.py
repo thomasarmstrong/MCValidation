@@ -15,6 +15,7 @@ from ctapipe.calib import pedestals
 from ctapipe.calib import CameraCalibrator, CameraDL1Calibrator
 from ctapipe.analysis.camera.chargeresolution import ChargeResolutionCalculator
 from scipy.interpolate import interp1d
+import argparse
 
 
 PIXEL_EPSILON = 0.0002
@@ -57,6 +58,7 @@ class Geometry:
         # TODO Make this more flexible for lab setup
 
         self.required_pe = 100
+        self.camera = "CHEC"
         self.geom = CameraGeometry.from_name("CHEC")
         self.npix = len(self.geom.pix_id)
         self.total_scale = np.ones(self.npix)
@@ -64,7 +66,7 @@ class Geometry:
         self.camera_curve_center_x = 1
         self.camera_curve_center_y = 0
         self.camera_curve_radius = 1
-        self.pixel_pos = np.load("/Users/armstrongt/Software/CTA/CHECsoft/CHECAnalysis/targetpipe/targetpipe/io/checm_pixel_pos.npy")
+        # self.pixel_pos = np.load("/Users/armstrongt/Software/CTA/CHECsoft/CHECAnalysis/targetpipe/targetpipe/io/checm_pixel_pos.npy")
         self.pix_size = np.sqrt(self.geom.pix_area[0]).value
         self.fiducial_radius = 0.2
         self.fiducial_center = self.camera_curve_center_x + self.camera_curve_radius * np.cos(np.pi) # This is a little confusing, is it going to be set up to change the position of the lightsource
@@ -86,9 +88,9 @@ class Geometry:
         self.pix_percent = self.pix_sa / self.lightsource_sa
         if self.pix_percent > 1: self.pix_percent = 1
 
-        photons = self.set_illumination(self.required_pe)
-        print(photons)
-        print(self.lightsource_angle)
+        # photons = self.set_illumination(self.required_pe)
+        # print(photons)
+        # print(self.lightsource_angle)
 
     def set_illumination(self, lambda_, tote_trans):
         self.lamda = lambda_
@@ -105,7 +107,7 @@ class Geometry:
         self.ax.add_artist(plt.Circle((x, y), r, color='b', fill=False))
 
     def plot_pixels(self):
-        pix_x = np.unique(np.reshape(self.pixel_pos[0], (32, 64))[10:16])
+        pix_x = np.unique(np.reshape(self.geom.pix_x, (32, 64))[10:16])
         pix_cy = np.reshape(pix_x, (6, 8))
         module_centers = pix_cy.mean(1)
         x0 = self.camera_curve_center_x
@@ -377,19 +379,27 @@ class Geometry:
 
 def main():
 
-    # To convert range of desired pe to Lightsource values
-    fl = np.loadtxt('/Users/armstrongt/Workspace/CTA/MCValidation/data/d2018-02-09_DynRange_NSB0_GainMatched200mV/runlist.txt', unpack=True)
+    print('WARNING THIS NEEDS WORK, mostly hardcoded')
+    parser = argparse.ArgumentParser(description='Get number of photons for LightEmission package for a requested p.e. per pixel')
+    parser.add_argument('--runfile', help='Path to runfile that contains run number and requested/estimated p.e.')
+    parser.add_argument('--pdefile', help='Path to PDE file, used to obtain efficiency at given wavelength')
+    parser.add_argument('--transmission', help='Path to additional transmission file, used to obtain efficiency at given wavelength')
+    parser.add_argument('--wavelength', default=405, type=float, help='wavelength of lightsource used')
+    parser.add_argument('--camera', default="CHEC", help='ctapipe camera geometery to use')
+    args = parser.parse_args()
 
-    pde = np.loadtxt('configs/PDE_ASTRI_LCT5_75um_OV_4V_meas.dat',unpack=True)
+    # To convert range of desired pe to Lightsource values
+    fl = np.loadtxt(args.runfile, unpack=True)
+    pde = np.loadtxt(args.pdefile,unpack=True)
     fpde = interp1d(pde[0], pde[1])
-    trans = np.loadtxt('configs/transmission_pmma_vs_lambda_meas0deg_coat_82raws.dat', unpack=True)
+    trans = np.loadtxt(args.transmission, unpack=True)
     ftrans = interp1d(trans[0], trans[1])
 
-    tote_trans = fpde(400) * ftrans(400)
+    tote_trans = fpde(args.wavelength) * ftrans(args.wavelength)
     print(tote_trans)
     exit()
 
-    g = Geometry()
+    g = Geometry(camera = args.camera)
     # pe = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 35, 37, 40, 43, 46, 49, 53, 57, 61, 65, 70, 75, 81, 86, 93, 100, 107, 114, 123, 132, 141, 151, 162, 174, 187, 200, 215, 231, 247, 265, 284, 305, 327, 351, 376, 403, 432, 464, 497, 533, 572, 613, 657, 705, 756, 811, 869, 932, 1000]
     # pe = [   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   12, 14,   16,   19,   22,   25,   29,   33,   39,   44,   51,   59, 68,   79,   91,  104,  120,  138,  159,  184,  212,  244,  281, 323,  372,  429,  494,  568,  655,  754,  868, 1000]
     pe = fl[2]
