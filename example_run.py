@@ -20,7 +20,7 @@ os.system("python run_simtel.py --infile ~/Workspace/CTA/MCValidation/data/d2018
           " -C FADC_BINS=128 "
           " -C pm_voltage_variation=0 "
           " -C gain_variation=0.1 "
-          " -C QE_variations=0.1 "
+          " -C QE_variation=0.1 "
           " -C discriminator_amplitude=1 "
           " -C discriminator_gate_length=-8 "
           " -C discriminator_output_amplitude=1 "
