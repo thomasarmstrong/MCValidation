@@ -132,7 +132,7 @@ def main():
         if args.runLightEmission:
             print("@@@@ Running LightEmission Package\n\n")
             if args.nevents=="File":
-                run_lightemission(events=infile[], photons=photons,
+                run_lightemission(events=infile[5], photons=photons,
                                   out_file=infl, ang_dist=args.angdist,
                                   distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
             else:
@@ -142,7 +142,7 @@ def main():
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
             if args.discthresh == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[5], extra_opts=args.extra_opts)
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[3], extra_opts=args.extra_opts)
             else:
                 run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
 

@@ -8,7 +8,7 @@ os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValida
           " --camradius 30 "
           " --runLightEmission "
           " --nsb 0.005 "
-          " --discthresh File "
+          " --discthresh 0 "
           " --extra_opts \" "
           " -C CAMERA_CONFIG_FILE=/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/02_cameraConfigFile/camera_CHEC-S_prototype_26042018.dat "
           " -C quantum_efficiency=/scratch/armstrongt/Workspace/CTA/MCValidation/data/config/camera/10_quantumEfficiency/S10362-11-050U-3V.txt "
