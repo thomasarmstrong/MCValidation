@@ -1,7 +1,7 @@
 import os
 
-os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/test/runlist_part1.txt "
-          " --outdir /home/armstrongt/Workspace/CTA/MCValidation/data/test "
+os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/d2018-05-14_100mV_fw50pe/runlist_update.txt "
+          " --outdir /home/armstrongt/Workspace/CTA/MCValidation/data/d2018-05-14_100mV_fw50pe/mcUpdate "
           " --nevents 100 "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
