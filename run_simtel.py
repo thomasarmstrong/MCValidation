@@ -100,8 +100,8 @@ def main():
     try:
         infile  = np.loadtxt(args.infile, unpack=True)
         runN    = infile[0]
-        pe      = infile[1]
-        photons = infile[2]
+        pe      = infile[3]
+        photons = infile[4]
     except FileNotFoundError:
         print('No such input file, please specify one with --infile FILE')
 
@@ -111,9 +111,15 @@ def main():
             outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN[n]))
             if args.runLightEmission:
                 print("@@@@ Running LightEmission Package\n\n")
-                run_lightemission(events=args.nevents, photons = photons[n],
-                                  out_file=infl, ang_dist=args.angdist,
-                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+                if args.nevents=="File":
+                    run_lightemission(events=infile[5][n], photons = photons[n],
+                                      out_file=infl, ang_dist=args.angdist,
+                                      distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+                else:
+                    run_lightemission(events=args.nevents, photons=photons[n],
+                                      out_file=infl, ang_dist=args.angdist,
+                                      distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
+                                      ydisp=args.ydisp)
             if args.runSimTelarray:
                 print("@@@@ Running Simtelarray\n\n")
                 if args.discthresh=="File":
@@ -125,13 +131,18 @@ def main():
         outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN))
         if args.runLightEmission:
             print("@@@@ Running LightEmission Package\n\n")
-            run_lightemission(events=args.nevents, photons=photons,
-                              out_file=infl, ang_dist=args.angdist,
-                              distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+            if args.nevents=="File":
+                run_lightemission(events=infile[], photons=photons,
+                                  out_file=infl, ang_dist=args.angdist,
+                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+            else:
+                run_lightemission(events=args.nevents, photons=photons,
+                                  out_file=infl, ang_dist=args.angdist,
+                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
             if args.discthresh == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[3], extra_opts=args.extra_opts)
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[5], extra_opts=args.extra_opts)
             else:
                 run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
 

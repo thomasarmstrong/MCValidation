@@ -399,6 +399,7 @@ def main():
     print('WARNING THIS NEEDS WORK, mostly hardcoded')
     parser = argparse.ArgumentParser(description='Get number of photons for LightEmission package for a requested p.e. per pixel')
     parser.add_argument('--runfile', help='Path to runfile that contains run number and requested/estimated p.e.')
+    parser.add_argument('--outfile', help='file to write out data', default=None)
     parser.add_argument('--pdefile', help='Path to PDE file, used to obtain efficiency at given wavelength')
     parser.add_argument('--transmission', help='Path to additional transmission file, used to obtain efficiency at given wavelength', default=None)
     parser.add_argument('--wavelength', default=405, type=float, help='wavelength of lightsource used')
@@ -410,12 +411,16 @@ def main():
     # To convert range of desired pe to Lightsource values
     try:
         fl = np.loadtxt(args.runfile, unpack=True)
-        pe = fl[2]
+        pe = fl[3]
         run = fl[0]
     except OSError:
         pe = [float(args.runfile)]
         run =[1]
 
+    out=None
+    if args.outfile != None:
+        out = open(args.outfile, 'w')
+        out.write('#run_number fw_pos fw_atten pe_expected ph_required n_events\n')
     ph = []
     pe2 =[]
     # run = []
@@ -449,6 +454,8 @@ def main():
         pe2.append(round(i,2))
         # run.append(int(fl[0][n]))
         # g.getscale(plot=False)
+        if args.outfile != None:
+            out.write('%s\t%s\t%s\t%s\t%s\t%s\n' % (int(fl[0][n]),int(fl[1][n]),fl[2][n],fl[3][n],round(photons,2),int(fl[4][n])))
     print('number of requested photoelectrons')
     print(pe2)
     print('number of required emitted photons')
