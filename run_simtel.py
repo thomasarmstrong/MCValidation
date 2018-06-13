@@ -100,8 +100,8 @@ def main():
     try:
         infile  = np.loadtxt(args.infile, unpack=True)
         runN    = infile[0]
-        pe      = infile[1]
-        photons = infile[2]
+        pe      = infile[2]
+        photons = infile[3]
     except FileNotFoundError:
         print('No such input file, please specify one with --infile FILE')
 
