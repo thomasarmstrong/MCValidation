@@ -21,7 +21,7 @@ os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValida
           " -C FADC_PEDESTAL=10000 "
           " -C FADC_AMPLITUDE=2.5 "
           " -C FADC_Noise=0.69 "
-          " -C FADC_pedestal_variation=0.1 "
+          " -C FADC_var_pedestal=0.1 "
           " -C FADC_SUM_OFFSET=15 "
           " -C FADC_Sum_Bins=96 "
           " -C FADC_BINS=128 "
