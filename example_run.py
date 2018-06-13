@@ -6,7 +6,7 @@ os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValida
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
           " --camradius 30 "
-          " --runLightEmission --runSimTelarray"
+          " --runSimTelarray"
           " --nsb 0.005 "
           " --discthresh 0 "
           " --extra_opts \" "
