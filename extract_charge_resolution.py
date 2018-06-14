@@ -139,8 +139,8 @@ class ChargeResolutionGenerator(Tool):
 
                     self.calculator.add_charges(true_charge, measured_charge)
 
-                if debug:
-                    plt.errorbar(input_pe, np.mean(true_pe), np.std(true_pe),color='k')
+                    if debug:
+                        plt.errorbar(input_pe, np.mean(true_pe), np.std(true_pe),color='k')
             except FileNotFoundError:
                 stop=0
                 print('file_not_found')
