@@ -116,7 +116,7 @@ class ChargeResolutionGenerator(Tool):
                     self.cal.calibrate(event)
                     self.dl0.reduce(event)
                     self.dl1.calibrate(event)
-                    input_pe = run_list[2][n]
+                    input_pe = run_list[3][n]
 
                     if self.plot_cam == True:
                         if disp is None:
