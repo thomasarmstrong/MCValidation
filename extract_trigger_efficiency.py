@@ -170,8 +170,9 @@ class ChargeResolutionGenerator(Tool):
             except FileNotFoundError:
                 stop=0
                 print('file_not_found')
+            print(n_trig, run_list[4][n], n_trig/run_list[4][n] )
             trig_eff.append(n_trig/run_list[4][n])
-
+        exit()
         plt.plot(n_pe, trig_eff )
         plt.show()
         if debug:
