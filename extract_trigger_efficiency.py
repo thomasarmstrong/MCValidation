@@ -112,13 +112,13 @@ class ChargeResolutionGenerator(Tool):
             elif self.calibrator == "HESSIOR1Calibrator":
                 file_name = "%s/sim_tel/run%05d.simtel.gz" % (self.input_path, int(run))
                 print(file_name)
-
+            n_trig = 0
             try:
                 source = EventSourceFactory.produce(input_url =file_name, max_events=self.max_events)
                 true_pe = []
                 # lab_pe = []
                 peds_all = []
-                n_trig = 0
+
                 for event in tqdm(source):
                     n_trig =+ 1
                     # true_pe.append()
