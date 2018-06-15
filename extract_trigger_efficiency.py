@@ -120,7 +120,8 @@ class ChargeResolutionGenerator(Tool):
                 peds_all = []
 
                 for event in tqdm(source):
-                    n_trig =+ 1
+                    n_trig = n_trig + 1
+                    print(n_trig)
                     # true_pe.append()
                 #     self.cal.calibrate(event)
                 #     self.dl0.reduce(event)
@@ -172,7 +173,7 @@ class ChargeResolutionGenerator(Tool):
                 print('file_not_found')
             print(n_trig, run_list[4][n], n_trig/run_list[4][n] )
             trig_eff.append(n_trig/run_list[4][n])
-        exit()
+            # exit()
         plt.plot(n_pe, trig_eff )
         plt.show()
         if debug:
