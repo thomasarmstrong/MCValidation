@@ -123,7 +123,7 @@ class ChargeResolutionGenerator(Tool):
 
                 for event in tqdm(source):
                     n_trig = n_trig + 1
-                    print(n_trig)
+                    # print(n_trig)
                     # true_pe.append()
                 #     self.cal.calibrate(event)
                 #     self.dl0.reduce(event)
