@@ -110,7 +110,7 @@ class ChargeResolutionGenerator(Tool):
                 file_name = "%s/Run%05d_r1.tio" % (self.input_path, int(run))
                 print(file_name)
             elif self.calibrator == "HESSIOR1Calibrator":
-                file_name = "%s/Run%05d_mc.simtel.gz" % (self.input_path, int(run))
+                file_name = "%s/sim_tel/run%05d.simtel.gz" % (self.input_path, int(run))
                 print(file_name)
 
             try:
