@@ -106,6 +106,7 @@ class ChargeResolutionGenerator(Tool):
             n_events.append(run_list[4][n])
             n_pe.append(run_list[3][n])
             # TODO remove need for hardcoded file name
+            file_name = None
             if self.calibrator == "TargetIOR1Calibrator":
                 file_name = "%s/Run%05d_r1.tio" % (self.input_path, int(run))
                 print(file_name)
@@ -114,7 +115,8 @@ class ChargeResolutionGenerator(Tool):
                 print(file_name)
             n_trig = 0
             try:
-                source = EventSourceFactory.produce(input_url =file_name, max_events=self.max_events)
+                print('trying to open file')
+                source = EventSourceFactory.produce(input_url=file_name, max_events=self.max_events)
                 true_pe = []
                 # lab_pe = []
                 peds_all = []
