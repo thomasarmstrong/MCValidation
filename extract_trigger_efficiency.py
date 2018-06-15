@@ -103,8 +103,8 @@ class ChargeResolutionGenerator(Tool):
             fig=plt.figure(1)
             ax=fig.add_subplot(111)
         for n, run in enumerate(run_list[0]):
-            n_events.append(run_list[3][n])
-            n_pe.append(run_list[2][n])
+            n_events.append(run_list[4][n])
+            n_pe.append(run_list[3][n])
             # TODO remove need for hardcoded file name
             if self.calibrator == "TargetIOR1Calibrator":
                 file_name = "%s/Run%05d_r1.tio" % (self.input_path, int(run))
@@ -170,7 +170,7 @@ class ChargeResolutionGenerator(Tool):
             except FileNotFoundError:
                 stop=0
                 print('file_not_found')
-            trig_eff.append(n_trig/run_list[3][n])
+            trig_eff.append(n_trig/run_list[4][n])
 
         plt.plot(n_pe, trig_eff )
         plt.show()
