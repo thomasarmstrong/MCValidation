@@ -107,7 +107,7 @@ def main():
 
     try:
         for n, p in enumerate(pe):
-            infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[n]))
+            infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(1))
             outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN[n]))
             if args.runLightEmission:
                 print("@@@@ Running LightEmission Package\n\n")
@@ -123,11 +123,11 @@ def main():
             if args.runSimTelarray:
                 print("@@@@ Running Simtelarray\n\n")
                 if args.discthresh=="File":
-                    run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=infile[3][n], extra_opts=args.extra_opts)
+                    run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=infile[5][n], extra_opts=args.extra_opts)
                 else:
                     run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
     except TypeError:
-        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN))
+        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(1))
         outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN))
         if args.runLightEmission:
             print("@@@@ Running LightEmission Package\n\n")
@@ -142,7 +142,7 @@ def main():
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
             if args.discthresh == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[3], extra_opts=args.extra_opts)
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[5], extra_opts=args.extra_opts)
             else:
                 run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
 
