@@ -87,7 +87,7 @@ class ChargeResolutionGenerator(Tool):
 
         self.cal = CameraCalibrator(r1_product=self.calibrator)
 
-        self.calculator = ChargeResolutionCalculator(**kwargs)
+        # self.calculator = ChargeResolutionCalculator(**kwargs)
 
 
     def start(self):
@@ -182,8 +182,9 @@ class ChargeResolutionGenerator(Tool):
             plt.ylabel('True mc p.e.')
             plt.show()
     def finish(self):
-        out_file = '%s/charge_resolution_test.h5' % self.input_path
-        self.calculator.save(self.output_name)
+        #out_file = '%s/charge_resolution_test.h5' % self.input_path
+        #self.calculator.save(self.output_name)
+        print('done')
 
 def main():
     exe = ChargeResolutionGenerator()
