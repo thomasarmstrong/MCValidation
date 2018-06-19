@@ -13,7 +13,8 @@ In order to simulate the lasers used in lab measurements and which can be read i
  package created by K Bernloehr (now part of the latest corsika_simtel distribution) which enables a generic light source to be
  defined by the number of emitted photons, light temporal, spectral and angular distribution (or single values).
 
-![labsetup](Figures/LightEmission_setup.png)
+
+![lab setup](Figures/LightEmission_setup.png)
 
 One initial difficulty is defining the desired number of photo-electrons emitted as part of the light source. In lab measurements
 the different light levels are generally created using a filterwheel, and the absolute illumination is calibrated by measuring the
@@ -24,15 +25,16 @@ any other transmission factors) to calculate the required number of photons need
 
 See the script:
 get_photons.py reads in a run list and provides the required number of photons emitted in LightEmission package to obtain the desired p.e. level
+
 ![input pe](Figures/inputTruepe.png)
 
 although this doesn't currently take into account full distributions of wavelength or angle. The light source can then simply be
 simulated by running the following
 
-'''
+```
 ./ff-1m --events <Nevents> --photons <Nphotons> --distance <z> --camera-radius <Rcam> --angular-distribution <File/isotropic>
 --spectrum <File/value> <(x, y)> -o <File>
-'''
+```
 
 run_simtel.py - just a script that runs the light emission package and sim_telarray. Also can generate a pixel mask file
 
