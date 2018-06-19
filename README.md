@@ -104,37 +104,64 @@ python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolu
 
 # Pulsed Light Measurements with External Trigger
 
-Pulsed light measurements at low illumination levels (“single-p.e.”) together with off-pulse (“dark”)
-control measurements. For disentangling the single-p.e. response from the superposition of multiple
-photoelectrons, measurements at multiple illumination levels – best with known attenuation
-ratios – from well below one p.e. up to a few p.e. are recommended but knowledge of absolute
-levels is not necessary. At operational gain (PMT) or bias voltage (SiPM). Measurements with
-the readout system of the camera are suitable for gain calibration (matching pedestal measurements
-also needed). Measurements with separate low-noise readout suitable for r.m.s. width of
-the individual peaks in the SiPM amplitude distribution and, for PMTs, for following the single-p.e.
-amplitude distribution down to lower amplitudes than available with the camera readout.
+> Pulsed light measurements at low illumination levels (“single-p.e.”) together with off-pulse (“dark”)
+> control measurements. For disentangling the single-p.e. response from the superposition of multiple
+> photoelectrons, measurements at multiple illumination levels – best with known attenuation
+> ratios – from well below one p.e. up to a few p.e. are recommended but knowledge of absolute
+> levels is not necessary. At operational gain (PMT) or bias voltage (SiPM). Measurements with
+> the readout system of the camera are suitable for gain calibration (matching pedestal measurements
+> also needed). Measurements with separate low-noise readout suitable for r.m.s. width of
+> the individual peaks in the SiPM amplitude distribution and, for PMTs, for following the single-p.e.
+> amplitude distribution down to lower amplitudes than available with the camera readout.
 
-Pulsed light measurements at moderate illumination levels (flat-fielding style) with external trigger,
-for pulse shapes and timing accuracy. Proper documentation of light pulse intrinsic shape is
-necessary. Also documentation on the stability of the external trigger with respect to the actual
-light pulse. Changing illumination levels via known optical attenuation, also down to low levels for
-corresponding single-p.e. calibration, is preferred but other types of attenuation are acceptable
-as long as attenuation ratios, light pulse shape, and trigger delay are under control. These measurements
-are most likely available as part of the charge resolution validation, B-xST-1010 and
-the time resolution validation, B-xST-1030. They may include different levels of emulated NSB.
-(Requires a significant part of a camera.)
+> Pulsed light measurements at moderate illumination levels (flat-fielding style) with external trigger,
+> for pulse shapes and timing accuracy. Proper documentation of light pulse intrinsic shape is
+> necessary. Also documentation on the stability of the external trigger with respect to the actual
+> light pulse. Changing illumination levels via known optical attenuation, also down to low levels for
+> corresponding single-p.e. calibration, is preferred but other types of attenuation are acceptable
+> as long as attenuation ratios, light pulse shape, and trigger delay are under control. These measurements
+> are most likely available as part of the charge resolution validation, B-xST-1010 and
+> the time resolution validation, B-xST-1030. They may include different levels of emulated NSB.
+> (Requires a significant part of a camera.)
 
-Pulse shapes at different pulse illumination levels (available with previous set of measurements
-for all camera types with trace readout). In addition to readout of normal trace length it may also
-be useful to obtain measurements with longer readout covering the tails of the pulses.
+> Pulse shapes at different pulse illumination levels (available with previous set of measurements
+> for all camera types with trace readout). In addition to readout of normal trace length it may also
+> be useful to obtain measurements with longer readout covering the tails of the pulses.
 
-Instead of the previous measurement, for cameras without trace readout it may be possible to
-measure the (integral or peak) signal at different delays of the external trigger.
+> Instead of the previous measurement, for cameras without trace readout it may be possible to
+> measure the (integral or peak) signal at different delays of the external trigger.
 
-Pulsed light measurements at high illumination levels: changing pulse shapes, high-gain to lowgain
-ratio, and non-linearity (at least up to required levels, typically 1000 p.e., optionally well
-beyond).
+> Pulsed light measurements at high illumination levels: changing pulse shapes, high-gain to lowgain
+> ratio, and non-linearity (at least up to required levels, typically 1000 p.e., optionally well
+> beyond).
 
 # Pulsed Light Measurements with Camera Trigger
 
+> Efficiency of the camera trigger as a function of illumination level (after calibration expressed in
+> corresponding level of photoelectrons). Measurements can either be with all but selected pixels
+> covered by a mask or by disabling all other pixels (i.e. turning the HV off). Should include different
+> multiplicities and topologies of activated pixels, within a trigger group and crossing boundaries of
+> trigger groups (sometimes referred to as “sectors”, sometimes as “patches”). These measurements
+> are particularly important for verifying the compliance with B-xST-1230 and for predicting
+> the telescope energy threshold (see example in Section 2). Most relevant are multiplicities
+> and topologies roughly corresponding to typical images near detection threshold. Also of interest
+> would be a muon-ring-like topology.
+
+> Position of pulses in the readout window for different illumination levels, for the measurements
+> as before. Both for illumination levels barely triggering and for high intensities the pulses should
+> be well contained in the readout window.
+
 # Electronic Test Pulses Instead of Light Pulses
+
+> Some measurements are more readily done with electronic pulse generators rather than with pulses
+> from the photosensors. Such measurements may also be suitable for testing the electronics chain
+> simulation.
+
+> Effective trigger window The signal from an appropriate signal generator, that mimics a Cherenkov
+> signal and is large enough to trigger, is fed in the minimum number of channels that can trigger
+> the readout. The signal in one channel is externally delayed and the trigger efficiency recorded as
+> function of time difference to determine the effective trigger window
+
+> Analog-sum trigger with clipping Recording the output signal of the clipping and sum stage as
+> a function of input signal amplitude. Recorded should be the full pulse shape and over a range
+> that results in clipping of the signal to determine the transfer function of the clipping stage.
