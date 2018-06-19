@@ -1,4 +1,14 @@
 # MCValidation
+
+The goal of this repository is to create some scripts and examples of how to produce and analise the MC data for the
+MCValidation process, focusing on using the LightEmission package to replicate lab measurements. See https://forge.in2p3.fr/projects/cta_analysis-and-simulations/repository/changes/Simulations/MCMeasurements/mcmeas.pdf
+which lays out some of the test measurements that will be used, and are generally grouped in the following cases: Pedestal and noise measurements,
+basic photo-sensor response, pulsed light measurements with external trigger, pulsed light measurements with camera trigger and
+electronic test pulses instead of light pulses. Before looking at each one of these it is important to evaluate the tools
+that we need for this process.
+
+# LightEmission Package
+
 Files:
 get_photons.py reads in a run list and provides the required number of photons emitted in LightEmission package to obtain the desired p.e. level
 ![input pe](Figures/inputTruepe.png)
