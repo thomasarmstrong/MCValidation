@@ -28,7 +28,8 @@ Looking at the distribution of true mc p.e. recorded from the simulation compare
 There is, as is expected a slight bias due to the geometry and, in this case the curved focal plane, where we expect to see fewer photo-electrons
 towards the edge of the camera.
 
-![input pe](Figures/inputTruepe.png)
+
+<img src="Figures/inputTruepe.png" width="48">
 
 Note that script doesnt doesn't currently take into account full distributions of wavelength or angle (issue #1). The light source can then simply be
 simulated by running the following
@@ -43,8 +44,10 @@ and mirrors. A helper script has been created, run_simtel.py which runs the ligh
 
 example run:
 
+```
 python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 --runLightEmission --angdist ./angular_distribution.dat
 --distance 100 --camradius 30 --runSimTelarray --nsb 0 --discthresh 0
+```
 
 Additionally, there are some helper scripts for the helper script... (the example...py). But these are mainly here to keep track
 of some different runs performed and will be replaced with config files shortly (see issue #2).
