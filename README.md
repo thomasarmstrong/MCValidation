@@ -29,7 +29,7 @@ There is, as is expected a slight bias due to the geometry and, in this case the
 towards the edge of the camera.
 
 
-<img src="Figures/inputTruepe.png" width="200">
+<img src="Figures/inputTruepe.png" width="500">
 
 Note that script doesnt doesn't currently take into account full distributions of wavelength or angle (issue #1). The light source can then simply be
 simulated by running the following
