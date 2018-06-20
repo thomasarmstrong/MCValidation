@@ -52,6 +52,7 @@ of some different runs performed and will be replaced with config files shortly 
 
 # Data Exploration
 
+## Assumed data formats:
 
 compare_waveforms.py - simple script to view waveforms in parallel for lab and MC
 
@@ -67,6 +68,9 @@ python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolu
 
 ![comp charge res](Figures/compare_charge_res.png)
 
+---
+The following are measurement categories taken from mcmeas.pdf meantioed at the start. The quotes are the text extracted
+from the document followed by description of the method(s) that will be implemented.
 
 # Pedestal and Noise Measurements
 
@@ -77,6 +81,10 @@ python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolu
 > window length as intended for later operation and with a window length as long as possible to
 > extract also lower-frequency noise contributions. (Single sensors or camera parts. Relevant for
 > MC parameters and algorithms related to pedestals, electronics noise, and dark count rates.)
+
+To simulate this, there are now two methods. 1) Simply use a dummy corsika event (such as one created by the flatfielding
+code with only 1 photon) and increase the NSB parameter, or 2) use the new NSB code, nsbls, available with the LightEmission
+package.
 
 # Basic Photo-Sensor Response
 
@@ -165,3 +173,9 @@ python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolu
 > Analog-sum trigger with clipping Recording the output signal of the clipping and sum stage as
 > a function of input signal amplitude. Recorded should be the full pulse shape and over a range
 > that results in clipping of the signal to determine the transfer function of the clipping stage.
+
+___
+
+# Lab measurements not covered above
+
+Rate scan?
