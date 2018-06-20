@@ -97,9 +97,14 @@ package.
 > or camera parts. Not all of these measurements will have a direct comparison in simulations, e.g.
 > when measuring the photocathode currents for the quantum efficiency of PMTs.)
 
+Not considered for now.
+
 > Light collector plus photosensor efficiency versus angle of incidence, either in absolute units
 > as for normal incidence or relative to the efficiency of the masked PMT (and scaled of light collector
 > exit area over entry area).
+
+This could be performed by setting the position of the light source and angular distribution in order to match a specified
+measurement, however this could only be done relative to on axis efficiency. Not considered for now.
 
 > Afterpulsing measurements for PMTs (between 4 and 40 p.e. or to amplitudes beyond which the
 > afterpulse probability is < 10−9), revealing integral afterpulse fractions and spectrum of afterpulses.
@@ -108,10 +113,15 @@ package.
 > for this purpose, together with matching calibration measurement data. Other ways to measure
 > afterpulsing are acceptable as long as the p.e. scale is well-defined.
 
+It seems like this is only nescesery to provide the data for the pm_photoelectron_spectrum parameter?
+
 > SiPM dark count measurements at the bias voltage as used in the camera, revealing dark count
 > rate and pure optical-cross talk probability. In addition to measurements with the camera electronics,
 > additional measurements with low-noise electronics are appreciated for this purpose, in
 > particular for the width of the individual peaks in the amplitude distribution.
+
+Same as above? Do we want to be able to reproduce the measured SPE? For this then we just need to have a script to create
+the SPE distribution. Code for this already exists but I can include it here. Issue #4
 
 # Pulsed Light Measurements with External Trigger
 
@@ -125,6 +135,8 @@ package.
 > the individual peaks in the SiPM amplitude distribution and, for PMTs, for following the single-p.e.
 > amplitude distribution down to lower amplitudes than available with the camera readout.
 
+Setting up measurements for gain calibration shouldnt be to hard, just need script to derive the single p.e. spectrum.
+
 > Pulsed light measurements at moderate illumination levels (flat-fielding style) with external trigger,
 > for pulse shapes and timing accuracy. Proper documentation of light pulse intrinsic shape is
 > necessary. Also documentation on the stability of the external trigger with respect to the actual
@@ -135,16 +147,26 @@ package.
 > the time resolution validation, B-xST-1030. They may include different levels of emulated NSB.
 > (Requires a significant part of a camera.)
 
+This involves simulating a dynamic range run, script to obtain the charge resolution already exists, see
+extract_trigger_efficiency.py. The required documentation of the pulse intrinsic shape will be used to setup the light
+source simulation.
+
 > Pulse shapes at different pulse illumination levels (available with previous set of measurements
 > for all camera types with trace readout). In addition to readout of normal trace length it may also
 > be useful to obtain measurements with longer readout covering the tails of the pulses.
 
+Simple to implement, obtain average pulse shape/waveform at each illumination.
+
 > Instead of the previous measurement, for cameras without trace readout it may be possible to
 > measure the (integral or peak) signal at different delays of the external trigger.
+
+Need better understanding of how to set this up.
 
 > Pulsed light measurements at high illumination levels: changing pulse shapes, high-gain to lowgain
 > ratio, and non-linearity (at least up to required levels, typically 1000 p.e., optionally well
 > beyond).
+
+Just a combination of the previous measurements?
 
 # Pulsed Light Measurements with Camera Trigger
 
@@ -157,6 +179,9 @@ package.
 > the telescope energy threshold (see example in Section 2). Most relevant are multiplicities
 > and topologies roughly corresponding to typical images near detection threshold. Also of interest
 > would be a muon-ring-like topology.
+
+Can be done with a similar dataset as before, script exists (see extract_trigger_efficiency.py). The functionality of
+the mask code needs some improvement.
 
 > Position of pulses in the readout window for different illumination levels, for the measurements
 > as before. Both for illumination levels barely triggering and for high intensities the pulses should
