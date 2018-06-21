@@ -20,7 +20,8 @@ One initial difficulty is defining the desired number of photo-electrons emitted
 the different light levels are generally created using a filterwheel, and the absolute illumination is calibrated by measuring the
 detected number of photo-electrons and calibrate it using the single p.e. measurements [Needs confirmation and better description].
 For now a simple approach has been adapted that takes the input requested geometry and the photon detection efficiency (along with
-any other transmission factors) to calculate the required number of photons needed to produce a desired (average) number of photo-electrons.
+any other transmission factors) to calculate the required number of photons needed to produce a desired (average) number
+of photo-electrons.
 
 
 See the script get_photons.py which reads in a run list and provides the required number of photons emitted in LightEmission package to obtain the desired p.e. level.
@@ -60,20 +61,15 @@ Npe, Nphotons*, NSB+noise, discriminator_threshold)
 
 # Data Exploration
 
+There are plenty of example scripts available in ctapipe/examples. Here we simply put a few specific examples that have
+been created here
 
 compare_waveforms.py - simple script to view waveforms in parallel for lab and MC
 
 ![example waveform](Figures/compare_waveform.png)
 
-exctract_charge_resolution.py 
 
-python extract_charge_resolution.py --input_path ./d2018-02-09_DynRange_NSB0_mc --max_events 10 -o ./charge_resolution_test.h5 --calibrator HESSIOR1Calibrator -T 1 --plot_cam False --use_true_pe True
 
-result can be plotted using 
-
-python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolution_true_pe.h5', './charge_resolution_labpe.h5']"  -O ./comp_charge_res.png
-
-![comp charge res](Figures/compare_charge_res.png)
 
 ---
 # Lab/MC Measurements
@@ -156,6 +152,17 @@ Setting up measurements for gain calibration shouldnt be to hard, just need scri
 This involves simulating a dynamic range run, script to obtain the charge resolution already exists, see
 extract_trigger_efficiency.py. The required documentation of the pulse intrinsic shape will be used to setup the light
 source simulation.
+
+exctract_charge_resolution.py
+
+python extract_charge_resolution.py --input_path ./d2018-02-09_DynRange_NSB0_mc --max_events 10 -o ./charge_resolution_test.h5 --calibrator HESSIOR1Calibrator -T 1 --plot_cam False --use_true_pe True
+
+result can be plotted using
+
+python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolution_true_pe.h5', './charge_resolution_labpe.h5']"  -O ./comp_charge_res.png
+
+![comp charge res](Figures/compare_charge_res.png)
+
 
 > Pulse shapes at different pulse illumination levels (available with previous set of measurements
 > for all camera types with trace readout). In addition to readout of normal trace length it may also
