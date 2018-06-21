@@ -52,10 +52,14 @@ python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 -
 Additionally, there are some helper scripts for the helper script... (the example...py). But these are mainly here to keep track
 of some different runs performed and will be replaced with config files shortly (see issue #2).
 
+# Assumed data formats:
+
+For this work, we assume that the data is organised as separate runs (RunX.format) in a folder which has a corresponding
+runlist.dat, where the dat file contains columns describing the data run (RunNumber, Filterwheel_position, Filterwheel_attenuation,
+Npe, Nphotons*, NSB+noise, discriminator_threshold)
 
 # Data Exploration
 
-## Assumed data formats:
 
 compare_waveforms.py - simple script to view waveforms in parallel for lab and MC
 
@@ -72,10 +76,12 @@ python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolu
 ![comp charge res](Figures/compare_charge_res.png)
 
 ---
+# Lab/MC Measurements
+
 The following are measurement categories taken from mcmeas.pdf meantioed at the start. The quotes are the text extracted
 from the document followed by description of the method(s) that will be implemented.
 
-# Pedestal and Noise Measurements
+## Pedestal and Noise Measurements
 
 > Baseline (pedestal) measurements without any light source and with increasing levels of nonpulsed
 > background light (emulating NSB over the expected range in observations, e.g. from zero
@@ -89,7 +95,7 @@ To simulate this, there are now two methods. 1) Simply use a dummy corsika event
 code with only 1 photon) and increase the NSB parameter, or 2) use the new NSB code, nsbls, available with the LightEmission
 package.
 
-# Basic Photo-Sensor Response
+## Basic Photo-Sensor Response
 
 > For normal incidence the PDE (photon detection efficiency) for SiPM at the bias voltage as used
 > in the camera. QE and CE (quantum efficiency / collection efficiency) for PMTs, over the light
@@ -123,7 +129,7 @@ It seems like this is only nescesery to provide the data for the pm_photoelectro
 Same as above? Do we want to be able to reproduce the measured SPE? For this then we just need to have a script to create
 the SPE distribution. Code for this already exists but I can include it here. Issue #4
 
-# Pulsed Light Measurements with External Trigger
+## Pulsed Light Measurements with External Trigger
 
 > Pulsed light measurements at low illumination levels (“single-p.e.”) together with off-pulse (“dark”)
 > control measurements. For disentangling the single-p.e. response from the superposition of multiple
@@ -168,7 +174,7 @@ Need better understanding of how to set this up.
 
 Just a combination of the previous measurements?
 
-# Pulsed Light Measurements with Camera Trigger
+## Pulsed Light Measurements with Camera Trigger
 
 > Efficiency of the camera trigger as a function of illumination level (after calibration expressed in
 > corresponding level of photoelectrons). Measurements can either be with all but selected pixels
@@ -187,7 +193,7 @@ the mask code needs some improvement.
 > as before. Both for illumination levels barely triggering and for high intensities the pulses should
 > be well contained in the readout window.
 
-# Electronic Test Pulses Instead of Light Pulses
+## Electronic Test Pulses Instead of Light Pulses
 
 > Some measurements are more readily done with electronic pulse generators rather than with pulses
 > from the photosensors. Such measurements may also be suitable for testing the electronics chain
@@ -204,6 +210,6 @@ the mask code needs some improvement.
 
 ___
 
-# Lab measurements not covered above
+## Lab measurements not covered above
 
 Rate scan?
