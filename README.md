@@ -59,12 +59,22 @@ For this work, we assume that the data is organised as separate runs (RunX.forma
 runlist.dat, where the dat file contains columns describing the data run (RunNumber, Filterwheel_position, Filterwheel_attenuation,
 Npe, Nphotons*, NSB+noise, discriminator_threshold)
 
+In order to read in data from the different cameras, readers in ctapipe need to be implemented and if necessary the
+relevant camera softwehere needs to be installed.
+
 # Data Exploration
 
 There are plenty of example scripts available in ctapipe/examples. Here we simply put a few specific examples that have
-been created here
+been created here.
 
-compare_waveforms.py - simple script to view waveforms in parallel for lab and MC
+compare_waveforms.py - simple script to view waveforms in parallel for lab and MC, this can simply be run as
+
+```
+python compare_waveforms.py --mcfile data/runX.simtel.gz --labfile data/runX.format
+```
+
+which would give you all the waveformes in each file, but there are also some extra flags that let you select pixels etc.
+The output should look something like:
 
 ![example waveform](Figures/compare_waveform.png)
 
