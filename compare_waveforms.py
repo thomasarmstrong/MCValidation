@@ -31,39 +31,42 @@ ax2.set_ylabel('amplitude')
 ax2.set_xlabel('time [ns]')
 
 ######### CAMERA DATA p.e. ###########
-cal = CameraCalibrator(r1_product="TargetioR1Calibrator")
+cal = CameraCalibrator()
 try:
     for event_r1 in tqdm(event_source(args.labfile, max_events=args.maxevents), total = args.maxevents):
         cal.calibrate(event_r1) # Not needed as it is already R1 data?
+        print(event_r1.r1.tels_with_data)
         print('\n\nCamera Event\n\n')
-        if args.lab_pix == None:
-            for i in range(0,64):
-                if args.lab_thresh==None:
-                    ax1.plot(range(len(event_r1.r1.tel[0].waveform[0][0])), event_r1.r1.tel[0].waveform[0][i]/args.mv2pe,
-                             color='C0')
-                else:
-                    if max(event_r1.r1.tel[0].waveform[0][i])/args.mv2pe > args.lab_thresh:
-                        print('plotting only lab pixel: ', i)
-                        ax1.plot(range(len(event_r1.r1.tel[0].waveform[0][0])), event_r1.r1.tel[0].waveform[0][i]/args.mv2pe,color='C0')
+        for tel in event_r1.r1.tels_with_data:
+            if args.lab_pix == None:
+                for i in range(0,64):
+                    if args.lab_thresh==None:
+                        ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe,
+                                 color='C0')
+                    else:
+                        if max(event_r1.r1.tel[tel].waveform[0][i])/args.mv2pe > args.lab_thresh:
+                            print('plotting only lab pixel: ', i)
+                            ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe,color='C0')
 
 
 except FileNotFoundError:
     print('LAB file_not_found')
 
 ######### MC DATA p.e. ###########
-cal2 = CameraCalibrator(r1_product="HESSIOR1Calibrator")
+cal2 = CameraCalibrator()
 try:
     for event_mc2 in tqdm(event_source(args.mcfile, max_events=args.maxevents), total=args.maxevents):
         cal2.calibrate(event_mc2)
         print('\n\nMonte Carlo Event\n\n')
-        if args.mc_pix == None:
-            for i in range(0,64):
-                if args.mc_thresh == None:
-                    ax2.plot(range(len(event_mc2.r1.tel[1].waveform[0][0])), event_mc2.r1.tel[1].waveform[0][i],color='C1')
-                else:
-                    if max(event_mc2.r1.tel[1].waveform[0][i])>args.mc_thresh:
-                        print('plotting only mc pixel: ', i)
-                        ax2.plot(range(len(event_mc2.r1.tel[1].waveform[0][0])), event_mc2.r1.tel[1].waveform[0][i],color='C1')
+        for tel in event_mc2.r1.tels_with_data:
+            if args.mc_pix == None:
+                for i in range(0,64):
+                    if args.mc_thresh == None:
+                        ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i],color='C1')
+                    else:
+                        if max(event_mc2.r1.tel[tel].waveform[0][i])>args.mc_thresh:
+                            print('plotting only mc pixel: ', i)
+                            ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i],color='C1')
 
 
 except FileNotFoundError:
