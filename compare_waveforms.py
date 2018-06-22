@@ -12,6 +12,7 @@ parser.add_argument('--labfile', help='Path to lab data file')
 parser.add_argument('--maxevents', default=1, help='maximum number of events to include')
 parser.add_argument('--mc_pix', default=None, type=int, help='specify pixel number to plot in MC data file, otherwise loop over 64')
 parser.add_argument('--lab_pix', default=None, type=int, help='specify pixel number to plot in LAB data file, otherwise loop over 64')
+parser.add_argument('--max_pix', default=None, type=int, help='maximum number of pixels, default from geom')
 parser.add_argument('--mc_thresh', default=None, type=float, help='minimum y value required to plot waveform')
 parser.add_argument('--lab_thresh', default=None, type=float, help='minimum y value required to plot waveform')
 parser.add_argument('--mv2pe', default=1, type=float, help='input for simple conversion from mV to pe for lab data')
@@ -35,11 +36,13 @@ cal = CameraCalibrator()
 try:
     for event_r1 in tqdm(event_source(args.labfile, max_events=args.maxevents), total = args.maxevents):
         cal.calibrate(event_r1) # Not needed as it is already R1 data?
-        print(event_r1.r1.tels_with_data)
         print('\n\nCamera Event\n\n')
         for tel in event_r1.r1.tels_with_data:
+            geom = event_r1.inst.subarray.tel[tel].camera
+            if args.max_pix==None:
+                args.max_pix = len(geom.pix_x)
             if args.lab_pix == None:
-                for i in range(0,64):
+                for i in range(0,args.max_pix):
                     if args.lab_thresh==None:
                         ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe,
                                  color='C0')
@@ -47,7 +50,10 @@ try:
                         if max(event_r1.r1.tel[tel].waveform[0][i])/args.mv2pe > args.lab_thresh:
                             print('plotting only lab pixel: ', i)
                             ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe,color='C0')
-
+            else:
+                ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])),
+                         event_r1.r1.tel[tel].waveform[0][args.lab_pix] / args.mv2pe,
+                         color='C0')
 
 except FileNotFoundError:
     print('LAB file_not_found')
@@ -59,15 +65,20 @@ try:
         cal2.calibrate(event_mc2)
         print('\n\nMonte Carlo Event\n\n')
         for tel in event_mc2.r1.tels_with_data:
+            geom = event_mc2.inst.subarray.tel[tel].camera
+            if args.max_pix==None:
+                args.max_pix = len(geom.pix_x)
             if args.mc_pix == None:
-                for i in range(0,64):
+                for i in range(0,args.max_pix ):
                     if args.mc_thresh == None:
                         ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i],color='C1')
                     else:
                         if max(event_mc2.r1.tel[tel].waveform[0][i])>args.mc_thresh:
                             print('plotting only mc pixel: ', i)
                             ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i],color='C1')
-
+            else:
+                ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][args.mc_pix],
+                         color='C1')
 
 except FileNotFoundError:
     print('MC file not found')
