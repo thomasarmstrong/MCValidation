@@ -1,6 +1,6 @@
 import os
 
-os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/dynamicrange_for_json/runlist.txt "
+os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/dynamicrange_for_json/runlist.txt "
           " --outdir /home/armstrongt/Workspace/CTA/MCValidation/data/dynamicrange_for_json "
           " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "

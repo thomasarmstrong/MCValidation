@@ -1,6 +1,6 @@
 import os
 
-os.system("python run_simtel.py --infile /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/runlist.txt "
+os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/runlist.txt "
           " --outdir /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/simtel "
           " --nevents File "
           " --angdist ../configs/ang_dist_mpik_flat_20deg.dat "

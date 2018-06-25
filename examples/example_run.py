@@ -1,6 +1,6 @@
 import os
 
-os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/test/runlist.txt "
+os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/test/runlist.txt "
           " --outdir /home/armstrongt/Workspace/CTA/MCValidation/data/test "
           " --nevents 1 "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
