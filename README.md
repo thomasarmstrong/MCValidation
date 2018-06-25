@@ -57,7 +57,7 @@ of some different runs performed and will be replaced with config files shortly 
 
 For this work, we assume that the data is organised as separate runs (RunX.format) in a folder which has a corresponding
 runlist.dat, where the dat file contains columns describing the data run (RunNumber, Filterwheel_position, Filterwheel_attenuation,
-Npe, Nphotons*, NSB+noise, discriminator_threshold)
+Npe, Nphotons*, Nevents, NSB+noise, discriminator_threshold)
 
 In order to read in data from the different cameras, readers in ctapipe need to be implemented and if necessary the
 relevant camera softwehere needs to be installed.
