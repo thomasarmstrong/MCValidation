@@ -1,6 +1,7 @@
 import os
 import argparse
 import numpy as np
+import multiprocessing
 
 ## Hardcoded parameters:
 simtel_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2017-12-08_testing/sim_telarray'
@@ -52,6 +53,76 @@ def run_lightemission(events=3, photons=10946249, distance=100, cam_radius=30, x
               '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, spectrum, xdisp, ydisp, out_file))
 
 
+def run_corsika_simtel(args, infile, n, p):
+    if not args.fixCorsika:
+        # infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
+        # else:
+        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][n]))
+
+        if args.runLightEmission:
+            print("@@@@ Running LightEmission Package\n\n")
+            if args.nevents == "File":
+                run_lightemission(events=infile[5][n], photons=infile[4][n],
+                                  out_file=infl, ang_dist=args.angdist,
+                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
+                                  ydisp=args.ydisp)
+            else:
+                run_lightemission(events=args.nevents, photons=infile[4][n],
+                                  out_file=infl, ang_dist=args.angdist,
+                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
+                                  ydisp=args.ydisp)
+
+    outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(infile[0][n]))
+    if args.runSimTelarray:
+        print("@@@@ Running Simtelarray\n\n")
+        if args.discthresh == "File":
+            if args.nsb == "File":
+                run_simtel(infile=infl, outfile=outfl, nsb=infile[6][n], disc_thresh=infile[7][n],
+                           extra_opts=args.extra_opts)
+            else:
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7][n],
+                           extra_opts=args.extra_opts)
+        else:
+            if args.nsb == "File":
+                run_simtel(infile=infl, outfile=outfl, nsb=infile[6][n], disc_thresh=args.discthresh,
+                           extra_opts=args.extra_opts)
+            else:
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
+                           extra_opts=args.extra_opts)
+
+    return ('run%04d.simtel.gz' % int(infile[0][n]), 0 )
+
+def run_corsika_simtel_noloop(args, infile):
+    infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0]))
+    outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(infile[0]))
+    if args.runLightEmission:
+        print("@@@@ Running LightEmission Package\n\n")
+        if args.nevents == "File":
+            run_lightemission(events=infile[5], photons=infile[4],
+                              out_file=infl, ang_dist=args.angdist,
+                              distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+        else:
+            run_lightemission(events=args.nevents, photons=infile[4],
+                              out_file=infl, ang_dist=args.angdist,
+                              distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+    if args.runSimTelarray:
+        print("@@@@ Running Simtelarray\n\n")
+        if args.discthresh == "File":
+            if args.nsb == "File":
+                run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=infile[7],
+                           extra_opts=args.extra_opts)
+            else:
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7],
+                           extra_opts=args.extra_opts)
+        else:
+            if args.nsb == "File":
+                run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=args.discthresh,
+                           extra_opts=args.extra_opts)
+            else:
+                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
+                           extra_opts=args.extra_opts)
+    return 0
+
 def main():
     if not os.path.isdir(simtel_path) or not os.path.isdir(simtel_path) or not os.path.isdir(lightEmission_path):
         print('Need to set paths (hardcoded!)')
@@ -77,6 +148,7 @@ def main():
     parser.add_argument('--extra_opts', default=' ', help='extra options for simtelarray, each must have -C proceeding')
     parser.add_argument('--only_pixels', default=None, help='list of pixels to have turned on')
     parser.add_argument('--fixCorsika', default=False, action='store_true')
+    parser.add_argument('--cores', deault=None, dtype=int, help='Multiprocessing, how many cores to use')
     args = parser.parse_args()
 
     if not os.path.isdir(args.outdir):
@@ -86,82 +158,50 @@ def main():
     if not os.path.isdir('%s/sim_tel/' % (args.outdir)):
         os.makedirs('%s/sim_tel/' % (args.outdir))
 
-    runN = None
-    pe = None
-    photons = None
+    infile=None
+
     try:
         infile = np.loadtxt(args.infile, unpack=True)
-        runN = infile[0]
-        pe = infile[3]
-        photons = infile[4]
     except FileNotFoundError:
         print('No such input file, please specify one with --infile FILE')
 
     try:
-        for n, p in enumerate(pe):
-            if args.fixCorsika:
-                infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[0]))
-            else:
-                infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[n]))
-            outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN[n]))
+        if args.fixCorsika:
+            print('Only running CORSIKA once')
+            infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
             if args.runLightEmission:
                 print("@@@@ Running LightEmission Package\n\n")
                 if args.nevents == "File":
-                    run_lightemission(events=infile[5][n], photons=photons[n],
+                    run_lightemission(events=infile[5][0], photons=infile[4][0],
                                       out_file=infl, ang_dist=args.angdist,
                                       distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
                                       ydisp=args.ydisp)
                 else:
-                    run_lightemission(events=args.nevents, photons=photons[n],
+                    run_lightemission(events=args.nevents, photons=infile[4][0],
                                       out_file=infl, ang_dist=args.angdist,
                                       distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
                                       ydisp=args.ydisp)
-            if args.runSimTelarray:
-                print("@@@@ Running Simtelarray\n\n")
-                if args.discthresh == "File":
-                    if args.nsb == "File":
-                        run_simtel(infile=infl, outfile=outfl, nsb=infile[6][n], disc_thresh=infile[7][n],
-                                   extra_opts=args.extra_opts)
-                    else:
-                        run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7][n],
-                                   extra_opts=args.extra_opts)
-                else:
-                    if args.nsb == "File":
-                        run_simtel(infile=infl, outfile=outfl, nsb=infile[6][n], disc_thresh=args.discthresh,
-                                   extra_opts=args.extra_opts)
-                    else:
-                        run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
-                                   extra_opts=args.extra_opts)
+
+
+        if args.cores is None:
+            for n, p in enumerate(infile[3]):
+                run_corsika_simtel(args, infile, n, p)
+        else:
+            tasks = []
+            pool = multiprocessing.Pool(args.cores)
+            print('using %s out of %s cores' % (args.cores, multiprocessing.cpu_count()))
+            for n, p in enumerate(infile[3]):
+                tasks.append((args, infile, n, p))
+
+            results = [pool.map_async(run_corsika_simtel, t) for t in tasks]
+
+            for result in results:
+                (fl, res) = result.get()
+                print('File %s run, with exit status %s' % (fl,res))
 
     except TypeError:
-        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN))
-        outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN))
-        if args.runLightEmission:
-            print("@@@@ Running LightEmission Package\n\n")
-            if args.nevents == "File":
-                run_lightemission(events=infile[5], photons=photons,
-                                  out_file=infl, ang_dist=args.angdist,
-                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
-            else:
-                run_lightemission(events=args.nevents, photons=photons,
-                                  out_file=infl, ang_dist=args.angdist,
-                                  distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
-        if args.runSimTelarray:
-            print("@@@@ Running Simtelarray\n\n")
-            if args.discthresh == "File":
-                if args.nsb == "File":
-                    run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=infile[7],
-                               extra_opts=args.extra_opts)
-                else:
-                    run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7],
-                               extra_opts=args.extra_opts)
-            else:
-                if args.nsb == "File":
-                    run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=args.discthresh,
-                               extra_opts=args.extra_opts)
-                else:
-                    run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
-                               extra_opts=args.extra_opts)
+        print('runfile appears to only have one line')
+        run_corsika_simtel_noloop(args, infile)
 
 
 if __name__ == '__main__':
