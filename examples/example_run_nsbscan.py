@@ -7,7 +7,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " --distance 155.2 "
           " --camradius 30 "
           " --runSimTelarray --runLightEmission"
-          " --fixCorsika "
+          " --fixCorsika --cores 10 "
           " --nsb File "
           " --discthresh 0 "
           " --extra_opts \" "
