@@ -148,7 +148,7 @@ def main():
     parser.add_argument('--extra_opts', default=' ', help='extra options for simtelarray, each must have -C proceeding')
     parser.add_argument('--only_pixels', default=None, help='list of pixels to have turned on')
     parser.add_argument('--fixCorsika', default=False, action='store_true')
-    parser.add_argument('--cores', default=None, dtype=int, help='Multiprocessing, how many cores to use')
+    parser.add_argument('--cores', default=None, help='Multiprocessing, how many cores to use')
     args = parser.parse_args()
 
     if not os.path.isdir(args.outdir):
@@ -188,7 +188,7 @@ def main():
                 run_corsika_simtel(args, infile, n, p)
         else:
             tasks = []
-            pool = multiprocessing.Pool(args.cores)
+            pool = multiprocessing.Pool(int(args.cores))
             print('using %s out of %s cores' % (args.cores, multiprocessing.cpu_count()))
             for n, p in enumerate(infile[3]):
                 tasks.append((args, infile, n, p))
