@@ -77,21 +77,25 @@ def main():
                         help='file containing the angular distribution of the light source')
     parser.add_argument('--spec', default=405, help='spectrum of the light source (filename or value)')
     parser.add_argument('--distance', default='100', help='distance of lightsource from detector [cm]')
-    parser.add_argument('--camradius', default='30', help='radius of the fiducial sphere that contains the detector [cm]')
+    parser.add_argument('--camradius', default='30',
+                        help='radius of the fiducial sphere that contains the detector [cm]')
     parser.add_argument('--xdisp', default=0, help='displacement of the light source in the x direction')
     parser.add_argument('--ydisp', default=0, help='displacement of the light source in the y direction')
     parser.add_argument('--runSimTelarray', action='store_true', default=False, help='Run Simtelarray')
-    parser.add_argument('--cfg', default='/%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg' % simtel_path, help='sim_telarray configuration file')
+    parser.add_argument('--cfg', default='/%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg' % simtel_path,
+                        help='sim_telarray configuration file')
     parser.add_argument('--nsb', default=0, help='level of non-pulsed background light [MHz]')
     parser.add_argument('--discthresh', default=0, help='level of discriminator threshold, 0 for external trigger')
     parser.add_argument('--extra_opts', default=' ', help='extra options for simtelarray, each must have -C proceeding')
     parser.add_argument('--only_pixels', default=None, help='list of pixels to have turned on')
-
+    parser.add_argument('--fixCorsika', default=False, action='store_true')
     args = parser.parse_args()
 
     if not os.path.isdir(args.outdir):
         os.makedirs(args.outdir)
+    if not os.path.isdir('%s/corsika/' % (args.outdir)):
         os.makedirs('%s/corsika/' % (args.outdir))
+    if not os.path.isdir('%s/sim_tel/' % (args.outdir)):
         os.makedirs('%s/sim_tel/' % (args.outdir))
 
     runN    = None
@@ -107,7 +111,10 @@ def main():
 
     try:
         for n, p in enumerate(pe):
-            infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(1))
+            if args.fixCorsika:
+                infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[0]))
+            else:
+                infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN[n]))
             outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN[n]))
             if args.runLightEmission:
                 print("@@@@ Running LightEmission Package\n\n")
@@ -123,11 +130,20 @@ def main():
             if args.runSimTelarray:
                 print("@@@@ Running Simtelarray\n\n")
                 if args.discthresh=="File":
-                    run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=infile[5][n], extra_opts=args.extra_opts)
+                    if args.nsb=="File":
+                        run_simtel(infile = infl,outfile = outfl, nsb=infile[6][n], disc_thresh=infile[7][n],
+                                   extra_opts=args.extra_opts)
+                    else:
+                        run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7][n],
+                                   extra_opts=args.extra_opts)
                 else:
-                    run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+                    if args.nsb=="File":
+                        run_simtel(infile = infl,outfile = outfl, nsb=infile[6][n], disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+                    else:
+                        run_simtel(infile = infl,outfile = outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+
     except TypeError:
-        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(1))
+        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(runN))
         outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(runN))
         if args.runLightEmission:
             print("@@@@ Running LightEmission Package\n\n")
@@ -142,9 +158,19 @@ def main():
         if args.runSimTelarray:
             print("@@@@ Running Simtelarray\n\n")
             if args.discthresh == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[5], extra_opts=args.extra_opts)
+                if args.nsb == "File":
+                    run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=infile[7],
+                               extra_opts=args.extra_opts)
+                else:
+                    run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7],
+                               extra_opts=args.extra_opts)
             else:
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh, extra_opts=args.extra_opts)
+                if args.nsb == "File":
+                    run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=args.discthresh,
+                               extra_opts=args.extra_opts)
+                else:
+                    run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
+                               extra_opts=args.extra_opts)
 
 if __name__ == '__main__':
     main()
