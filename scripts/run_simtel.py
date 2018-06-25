@@ -53,7 +53,8 @@ def run_lightemission(events=3, photons=10946249, distance=100, cam_radius=30, x
               '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, spectrum, xdisp, ydisp, out_file))
 
 
-def run_corsika_simtel(args, infile, n, p):
+def run_corsika_simtel(params):
+    args,infile,n,p = params
     if not args.fixCorsika:
         # infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
         # else:
@@ -192,12 +193,14 @@ def main():
             print('using %s out of %s cores' % (args.cores, multiprocessing.cpu_count()))
             for n, p in enumerate(infile[3]):
                 tasks.append((args, infile, n, p))
+            #print(tasks)
+            #results = [pool.map_async(run_corsika_simtel, t) for t in tasks]
 
-            results = [pool.map_async(run_corsika_simtel, t) for t in tasks]
+            print(pool.map(run_corsika_simtel, tasks))
 
-            for result in results:
-                (fl, res) = result.get()
-                print('File %s run, with exit status %s' % (fl,res))
+            #for result in results:
+             #   (fl, res) = result.get()
+              #  print('File %s run, with exit status %s' % (fl,res))
 
     except TypeError as e:
         print(e, ' runfile appears to only have one line')
