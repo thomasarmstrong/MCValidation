@@ -72,6 +72,8 @@ def run_corsika_simtel(params):
                                   out_file=infl, ang_dist=args.angdist,
                                   distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
                                   ydisp=args.ydisp)
+    else:
+        infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
 
     outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(infile[0][n]))
     if args.runSimTelarray:
