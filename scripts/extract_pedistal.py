@@ -18,20 +18,21 @@ from ctapipe.core import Tool
 from traitlets import Dict, List, Int, Unicode, Bool
 from ctapipe.image.charge_extractors import ChargeExtractorFactory
 from glob import glob
+from os import listdir
 
 debug = True
 
 ###### ToDo Define inputs via some sort of argparser, for now hardcode
 
-class ChargeResolutionGenerator(Tool):
-    name = "ChargeResolutionGenerator"
-    description = "Generate the a pickle file of ChargeResolutionFile for " \
+class PedestalGenerator(Tool):
+    name = "PedestalGenerator"
+    description = "Generate the a pickle file of Pedestals for " \
                   "either MC or data files."
 
     telescopes = Int(1,help='Telescopes to include from the event file. '
                            'Default = 1').tag(config=True)
-    output_name = Unicode('charge_resolution',
-                          help='Name of the output charge resolution hdf5 '
+    output_name = Unicode('extracted_pedestals',
+                          help='Name of the output extracted pedestal hdf5 '
                                'file').tag(config=True)
     input_path = Unicode(help='Path to directory containing data').tag(config=True)
 
@@ -39,34 +40,24 @@ class ChargeResolutionGenerator(Tool):
 
     plot_cam = Bool(False, "enable plotting of individual camera").tag(config=True)
 
-    use_true_pe = Bool(False, "Use true mc p.e.").tag(config=True)
 
-    calibrator = Unicode('HESSIOR1Calibrator', help='which calibrator to use, default = HESSIOR1Calibrator').tag(config=True)
+    t0 = Int(0, help='Timeslice to start pedestal')
 
-    aliases = Dict(dict(input_path='ChargeResolutionGenerator.input_path',
-                        calibrator='ChargeResolutionGenerator.calibrator',
-                        max_events='ChargeResolutionGenerator.max_events',
-                        extractor='ChargeExtractorFactory.product',
-                        window_width='ChargeExtractorFactory.window_width',
-                        t0='ChargeExtractorFactory.t0',
-                        window_shift='ChargeExtractorFactory.window_shift',
-                        sig_amp_cut_HG='ChargeExtractorFactory.sig_amp_cut_HG',
-                        sig_amp_cut_LG='ChargeExtractorFactory.sig_amp_cut_LG',
-                        lwt='ChargeExtractorFactory.lwt',
-                        clip_amplitude='CameraDL1Calibrator.clip_amplitude',
-                        radius='CameraDL1Calibrator.radius',
-                        max_pe='ChargeResolutionCalculator.max_pe',
-                        T='ChargeResolutionGenerator.telescopes',
-                        o='ChargeResolutionGenerator.output_name',
-                        plot_cam='ChargeResolutionGenerator.plot_cam',
-                        use_true_pe='ChargeResolutionGenerator.use_true_pe'
+    window_width = Int(10, help='length of window within which to determine pedestal')
+
+    aliases = Dict(dict(input_path='PedestalGenerator.input_path',
+                        max_events='PedestalGenerator.max_events',
+                        window_width='PedestalGenerator.window_width',
+                        t0='PedestalGenerator.t0',
+                        T='PedestalGenerator.telescopes',
+                        o='PedestalGenerator.output_name',
+                        plot_cam='PedestalGenerator.plot_cam'
                         ))
     classes = List([EventSourceFactory,
                     HESSIOEventSource,
                     TargetIOEventSource,
                     ChargeExtractorFactory,
                     CameraDL1Calibrator,
-                    ChargeResolutionCalculator,
                     CameraCalibrator
                     ])
 
@@ -76,7 +67,6 @@ class ChargeResolutionGenerator(Tool):
         self.r1 = None
         self.dl0 = None
         self.dl1 = None
-        self.calculator = None
         self.cal = None
 
     def setup(self):
@@ -85,13 +75,12 @@ class ChargeResolutionGenerator(Tool):
 
         self.dl1 = CameraDL1Calibrator(**kwargs)
 
-        self.cal = CameraCalibrator(r1_product=self.calibrator)
-
-        self.calculator = ChargeResolutionCalculator(**kwargs)
+        self.cal = CameraCalibrator()
 
 
     def start(self):
-        run_list = np.loadtxt('%s/runlist.txt' % self.input_path, unpack=True)
+        run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
+        file_list = listdir('%s' % self.input_path)
         plot_cam = False
         plot_delay = 0.5
         disp = None
@@ -100,29 +89,28 @@ class ChargeResolutionGenerator(Tool):
             fig=plt.figure(1)
             ax=fig.add_subplot(111)
         for n, run in enumerate(run_list[0]):
-            # TODO remove need for hardcoded file name
-            if self.calibrator == "TargetIOR1Calibrator":
-                file_name = "%s/Run%05d_r1.tio" % (self.input_path, int(run))
-                print(file_name)
-            elif self.calibrator == "HESSIOR1Calibrator":
-                file_name = "%s/Run%05d_mc.simtel.gz" % (self.input_path, int(run))
-                print(file_name)
+            #check
+            if str(int(run)) not in file_list[n]:
+                print(str(int(run)), file_list[n])
+                print('check runlist.txt order, needs to be sorted?')
+                exit()
+            file_name = "%s/%s" % (self.input_path, file_list[n])
+            print(file_name)
+
 
             try:
                 source = EventSourceFactory.produce(input_url =file_name, max_events=self.max_events)
                 true_pe = []
                 # lab_pe = []
+                peds_sdev = []
                 peds_all = []
                 for event in tqdm(source):
                     self.cal.calibrate(event)
                     self.dl0.reduce(event)
                     self.dl1.calibrate(event)
-                    input_pe = run_list[2][n]
-                    try:
-                        input_nsb = run_list[5][n]
-                    except IndexError:
-                        print('File has no column for NSB, setting to 0')
-                        input_nsb = 0
+                    input_pe = run_list[3][n]
+                    input_nsb = run_list[6][n]
+
                     if self.plot_cam == True:
                         if disp is None:
                             geom = event.inst.subarray.tel[self.telescopes].camera
@@ -132,11 +120,12 @@ class ChargeResolutionGenerator(Tool):
                         im = event.dl1.tel[self.telescopes].image[0]
                         disp.image = im
                         plt.pause(plot_delay)
-
-                    teldata = event.r0.tel[self.telescopes].waveform[0]
-                    peds = teldata[:, 0:10].mean(axis=1)
-                    peds2 = teldata[:, 0:10].std(axis=1)
-                    peds_all.append(teldata[:, 0:90])
+                    # print(event)
+                    teldata = event.r1.tel[self.telescopes].waveform[0]
+                    peds = teldata[400:800, self.t0:self.t0+self.window_width].mean(axis=1)
+                    peds2 = teldata[400:800, self.t0:self.t0+self.window_width].std(axis=1)
+                    peds_sdev.append(peds2)
+                    peds_all.append(teldata[400:800, self.t0:self.t0+self.window_width])
                     # plt.hist(peds,bins=50, alpha=0.4)
                     # plt.show()
                     # print(teldata)
@@ -157,7 +146,8 @@ class ChargeResolutionGenerator(Tool):
                     # self.calculator.add_charges(true_charge, measured_charge)
 
                 if debug:
-                    plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all), marker ='x',color='k')
+                    plt.hist(peds_sdev, bins=100)
+                    # plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all), marker ='x',color='k')
                     # plt.scatter(input_nsb, np.std(peds_all), marker ='x',color='k')
                     plt.xlabel('Non pulsed background light [GHz]')
                     plt.ylabel('Pedistal mean')
@@ -173,11 +163,12 @@ class ChargeResolutionGenerator(Tool):
         #     plt.ylabel('True mc p.e.')
         #     plt.show()
     def finish(self):
-        out_file = '%s/charge_resolution_test.h5' % self.input_path
-        self.calculator.save(self.output_name)
+        # out_file = '%s/charge_resolution_test.h5' % self.input_path
+        # self.calculator.save(self.output_name)
+        print('Done!')
 
 def main():
-    exe = ChargeResolutionGenerator()
+    exe = PedestalGenerator()
     exe.run()
 
 if __name__ == '__main__':
