@@ -199,8 +199,9 @@ def main():
                 (fl, res) = result.get()
                 print('File %s run, with exit status %s' % (fl,res))
 
-    except TypeError:
-        print('runfile appears to only have one line')
+    except TypeError as e:
+        print(e, ' runfile appears to only have one line')
+        exit()
         run_corsika_simtel_noloop(args, infile)
 
 
