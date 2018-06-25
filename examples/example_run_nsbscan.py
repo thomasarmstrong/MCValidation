@@ -1,7 +1,7 @@
 import os
 
-os.system("python run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/nsbscan/runlist.txt "
-          " --outdir /home/armstrongt/Workspace/CTA/MCValidation/data/nsbscan "
+os.system("python run_simtel.py --infile /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/runlist.txt "
+          " --outdir /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/simtel "
           " --nevents File "
           " --angdist ../configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
