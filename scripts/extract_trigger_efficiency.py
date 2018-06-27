@@ -55,7 +55,8 @@ class TriggerEffiencyGenerator(Tool):
         self.dl0 = None
         self.dl1 = None
         self.cal = None
-
+        self.trig_eff_array = []
+        self.disc_array = []
     def setup(self):
         kwargs = dict(config=self.config, tool=self)
         self.dl0 = CameraDL0Reducer(**kwargs)
@@ -80,9 +81,8 @@ class TriggerEffiencyGenerator(Tool):
             fig=plt.figure(1)
             ax=fig.add_subplot(111)
         for n, run in enumerate(run_list[0]):
-            n_events.append(run_list[4][n])
+            n_events.append(run_list[5][n])
             n_pe.append(run_list[3][n])
-            # TODO remove need for hardcoded file name
 
             if str(int(run)) not in file_list[n]:
                 print(str(int(run)), file_list[n])
@@ -95,18 +95,15 @@ class TriggerEffiencyGenerator(Tool):
             try:
                 print('trying to open file')
                 source = EventSourceFactory.produce(input_url=file_name, max_events=self.max_events)
-                true_pe = []
-                # lab_pe = []
-                peds_all = []
-
                 for event in tqdm(source):
                     n_trig = n_trig + 1
 
             except FileNotFoundError:
-                stop=0
                 print('file_not_found')
-            print(n_trig, run_list[4][n], n_trig/run_list[4][n] )
-            trig_eff.append(n_trig/run_list[4][n])
+            print(n_trig, run_list[5][n], n_trig/run_list[5][n] )
+            trig_eff.append(n_trig/run_list[5][n])
+            self.trig_eff_array.append(n_trig/run_list[5][n])
+            self.disc_array.append(run_list[7][n])
             # exit()
         plt.plot(n_pe, trig_eff )
         plt.show()
@@ -117,9 +114,12 @@ class TriggerEffiencyGenerator(Tool):
             plt.xlabel('Input p.e.')
             plt.ylabel('True mc p.e.')
             plt.show()
+            
     def finish(self):
-        #out_file = '%s/charge_resolution_test.h5' % self.input_path
-        #self.calculator.save(self.output_name)
+        out_file = open(self.output_name, 'w')
+        for n,i in enumerate(self.trig_eff_array):
+            out_file.write('%s\t%s\n' % (self.disc_array[n], i))
+        out_file.close()
         print('done')
 
 def main():
