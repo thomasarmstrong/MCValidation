@@ -1,7 +1,9 @@
 import os
 
 
-def make_mask(on_pixels, cam_file, out_file):
+def make_mask(on_pixels, cam_file_str, out_file_str):
+    cam_file = open(cam_file_str, 'r')
+    out_file = open(out_file_str, 'w')
     for line in cam_file:
         if line.startswith('Pixel'):
             data = line.strip().split(' ')
@@ -11,6 +13,8 @@ def make_mask(on_pixels, cam_file, out_file):
                 out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + data[4] + ' ' + '0\n')
         else:
             out_file.write(line)
+    cam_file.close()
+    out_file.close()
 
 
 make_mask([1385,1386,1337,1338,1339,1290,1291,1292,1243,1244],'/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/02_cameraConfigFile/camera_CHEC-S_prototype_26042018.dat','/home/armstrongt/Software/CTA/MCValidation/configs/camera_CHEC-S_prototype_26042018_masked.dat')
