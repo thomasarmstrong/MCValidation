@@ -70,6 +70,7 @@ class TriggerEffiencyGenerator(Tool):
     def start(self):
         run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
         file_list = listdir('%s' % self.input_path)
+        file_list.sort()
         plot_cam = False
         plot_delay = 0.5
         disp = None
