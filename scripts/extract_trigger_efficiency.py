@@ -68,7 +68,7 @@ class TriggerEffiencyGenerator(Tool):
 
 
     def start(self):
-        run_list = np.loadtxt('%s/runlist.txt' % self.input_path, unpack=True)
+        run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
         file_list = listdir('%s' % self.input_path)
         plot_cam = False
         plot_delay = 0.5
@@ -114,7 +114,7 @@ class TriggerEffiencyGenerator(Tool):
             plt.xlabel('Input p.e.')
             plt.ylabel('True mc p.e.')
             plt.show()
-            
+
     def finish(self):
         out_file = open(self.output_name, 'w')
         for n,i in enumerate(self.trig_eff_array):
