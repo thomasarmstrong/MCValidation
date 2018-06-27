@@ -1,12 +1,13 @@
 import os
 
-os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/dynamicrange_for_json/runlist.txt "
+os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Workspace/CTA/MCValidation/data/dynamicrange_for_json/runlist_part1.txt "
           " --outdir /home/armstrongt/Workspace/CTA/MCValidation/data/dynamicrange_for_json "
           " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
           " --camradius 30 "
           " --runSimTelarray "
+          " --cores 10 "
           " --nsb 0.005 "
           " --discthresh 0 "
           " --extra_opts \" "
