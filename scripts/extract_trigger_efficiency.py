@@ -40,7 +40,6 @@ class TriggerEffiencyGenerator(Tool):
                         radius='CameraDL1Calibrator.radius',
                         max_pe='TriggerEffiencyGenerator.max_pe',
                         T='TriggerEffiencyGenerator.telescopes',
-                        o='TriggerEffiencyGenerator.output_name',
                         plot_cam='TriggerEffiencyGenerator.plot_cam',
                         use_true_pe='TriggerEffiencyGenerator.use_true_pe'
                         ))
@@ -64,7 +63,7 @@ class TriggerEffiencyGenerator(Tool):
 
         self.dl1 = CameraDL1Calibrator(**kwargs)
 
-        self.cal = CameraCalibrator(r1_product=self.calibrator)
+        self.cal = CameraCalibrator()
 
 
 
