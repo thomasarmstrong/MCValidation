@@ -34,6 +34,7 @@ class TriggerEffiencyGenerator(Tool):
 
 
     aliases = Dict(dict(input_path='TriggerEffiencyGenerator.input_path',
+                        output_name='TriggerEffiencyGenerator.output_name',
                         max_events='TriggerEffiencyGenerator.max_events',
                         clip_amplitude='CameraDL1Calibrator.clip_amplitude',
                         radius='CameraDL1Calibrator.radius',
