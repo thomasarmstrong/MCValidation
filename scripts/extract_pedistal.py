@@ -1,8 +1,3 @@
-from ctapipe.calib.camera.r1 import (
-    CameraR1CalibratorFactory,
-    HESSIOR1Calibrator,
-    TargetIOR1Calibrator,
-    NullR1Calibrator)
 from ctapipe.io.hessioeventsource import HESSIOEventSource
 from ctapipe.io.targetioeventsource import TargetIOEventSource
 from ctapipe.visualization import CameraDisplay
@@ -13,11 +8,9 @@ from ctapipe.calib.camera.dl0 import CameraDL0Reducer
 from ctapipe.calib.camera.dl1 import CameraDL1Calibrator
 from tqdm import tqdm
 from ctapipe.io.eventsourcefactory import EventSourceFactory
-from ctapipe.analysis.camera.chargeresolution import ChargeResolutionCalculator
 from ctapipe.core import Tool
 from traitlets import Dict, List, Int, Unicode, Bool
 from ctapipe.image.charge_extractors import ChargeExtractorFactory
-from glob import glob
 from os import listdir
 
 debug = True

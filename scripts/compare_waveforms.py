@@ -9,7 +9,7 @@ import numpy as np
 parser = argparse.ArgumentParser(description='Run LightEmission and simtel')
 parser.add_argument('--mcfile', default=None, help='Path to mc data file')
 parser.add_argument('--labfile', default=None, help='Path to lab data file')
-parser.add_argument('--maxevents', default=1, help='maximum number of events to include')
+parser.add_argument('--maxevents', default=1, type=int, help='maximum number of events to include')
 parser.add_argument('--mc_pix', default=None, type=int, help='specify pixel number to plot in MC data file, otherwise loop over 64')
 parser.add_argument('--lab_pix', default=None, type=int, help='specify pixel number to plot in LAB data file, otherwise loop over 64')
 parser.add_argument('--max_pix', default=None, type=int, help='maximum number of pixels, default from geom')
