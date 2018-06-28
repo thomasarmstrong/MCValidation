@@ -85,7 +85,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
 # No QE var
 
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_spe_spectrum/runlist.txt "
-          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/origional_no_noise "
+          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/no_qevar "
           " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
@@ -127,7 +127,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
 # No FADC Noise
 
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_spe_spectrum/runlist.txt "
-          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/origional_no_noise "
+          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/no_fadcnoise "
           " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
@@ -168,7 +168,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
 # No FADC Var pedestal
 
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_spe_spectrum/runlist.txt "
-          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/origional_no_noise "
+          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/no_fadcvarped "
           " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
