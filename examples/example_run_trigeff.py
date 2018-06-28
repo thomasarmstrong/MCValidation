@@ -17,6 +17,7 @@ def make_mask(on_pixels, cam_file_str, out_file_str):
     out_file.close()
 
 
+print('making mask')
 make_mask([1385,1386,1337,1338,1339,1290,1291,1292,1243,1244],'/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/02_cameraConfigFile/camera_CHEC-S_prototype_26042018.dat','/home/armstrongt/Software/CTA/MCValidation/configs/camera_CHEC-S_prototype_26042018_masked.dat')
 
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/trig_eff_test/runlist.txt "
