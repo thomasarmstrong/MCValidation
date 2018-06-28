@@ -8,9 +8,9 @@ def make_mask(on_pixels, cam_file_str, out_file_str):
         if line.startswith('Pixel'):
             data = line.strip().split(' ')
             if int(data[0].split('\t')[1]) in on_pixels:
-                out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + data[4] + ' ' + '1\n')
+                out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + '1\n')
             else:
-                out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + data[4] + ' ' + '0\n')
+                out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + '0\n')
         else:
             out_file.write(line)
     cam_file.close()

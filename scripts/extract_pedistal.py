@@ -62,6 +62,10 @@ class PedestalGenerator(Tool):
         self.dl0 = None
         self.dl1 = None
         self.cal = None
+        self.baseline_bins = np.arange(0,7, 7/17.)
+        self.baseline_start_rms = []
+        self.baseline_start_mean =[]
+
 
     def setup(self):
         kwargs = dict(config=self.config, tool=self)
@@ -80,13 +84,17 @@ class PedestalGenerator(Tool):
         plot_delay = 0.5
         disp = None
 
-        pltnsb = [0.01, 0.05,0.100,0.200,0.300,0.500]
+        pltnsb = [0.01,0.05,0.100,0.200,0.300,0.500]
         if debug:
             fig=plt.figure(1)
             ax=fig.add_subplot(111)
             fig2 = plt.figure(2)
 
         for n, run in enumerate(run_list[0]):
+
+            if run_list[6][n] not in pltnsb:
+                print('lets save some time!')
+                continue
             if debug:
                 ax2 = fig2.add_subplot(7,8,n+1)
             #check
@@ -154,16 +162,16 @@ class PedestalGenerator(Tool):
                         baseline_end_mean.append(np.mean(teldata[:, -20:], axis=1))
                         baseline_end_rms.append(np.std(teldata[:, -20:], axis=1))
                     else:
-                        peds = np.mean(teldata[self.pixel, self.t0:self.t0 + self.window_width])
-                        peds2 = np.std(teldata[self.pixel, self.t0:self.t0 + self.window_width])
-                        peds_sdev.append(peds2)
-                        peds_mean.append(peds)
-                        peds_all.append(teldata[self.pixel, self.t0:self.t0 + self.window_width])
-                        for i in range(2048):
-                            maxpeak.append(max(teldata[i]))
-                        if debug:
-                            ax2.plot(range(len(teldata[100])), teldata[100])
-                            ax2.fill_between([self.t0, self.t0 + self.window_width], 0, 60, color='r', alpha=0.3)
+                        # peds = np.mean(teldata[self.pixel, self.t0:self.t0 + self.window_width])
+                        # peds2 = np.std(teldata[self.pixel, self.t0:self.t0 + self.window_width])
+                        # peds_sdev.append(peds2)
+                        # peds_mean.append(peds)
+                        # peds_all.append(teldata[self.pixel, self.t0:self.t0 + self.window_width])
+                        # for i in range(2048):
+                        maxpeak.append(max(teldata[self.pixel]))
+                        # if debug:
+                        #     ax2.plot(range(len(teldata[100])), teldata[100])
+                        #     ax2.fill_between([self.t0, self.t0 + self.window_width], 0, 60, color='r', alpha=0.3)
 
                         baseline_start_mean.append(np.mean(teldata[self.pixel, 0:20]))
                         baseline_start_rms.append(np.std(teldata[self.pixel, 0:20]))
@@ -171,8 +179,8 @@ class PedestalGenerator(Tool):
                         baseline_end_mean.append(np.mean(teldata[self.pixel, -20:]))
                         baseline_end_rms.append(np.std(teldata[self.pixel, -20:]))
 
-                    waveform_mean.append(np.mean(teldata, axis=1))
-                    waveform_rms.append(np.std(teldata, axis=1))
+                    # waveform_mean.append(np.mean(teldata, axis=1))
+                    # waveform_rms.append(np.std(teldata, axis=1))
 
 
                     # plt.hist(peds,bins=50, alpha=0.9)
@@ -195,43 +203,43 @@ class PedestalGenerator(Tool):
                     # self.calculator.add_charges(true_charge, measured_charge)
 
                 if debug and run_list[6][n] in pltnsb:
-                    ax.hist(peds_sdev, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
-                    # plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all), marker ='x',color='k')
-                    # plt.scatter(input_nsb, np.std(peds_all), marker ='x',color='k')
-                    ax.set_xlabel('Non pulsed background light [GHz]')
-                    ax.set_ylabel('Pedistal mean')
+                    # ax.hist(peds_sdev, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    # # plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all), marker ='x',color='k')
+                    # # plt.scatter(input_nsb, np.std(peds_all), marker ='x',color='k')
+                    # ax.set_xlabel('Non pulsed background light [GHz]')
+                    # ax.set_ylabel('Pedistal mean')
                     fig3 = plt.figure(3)
-                    plt.hist(maxpeak, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    plt.hist(maxpeak, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
                     plt.title('maxpeak')
                     plt.legend()
-                    fig4 = plt.figure(4)
-                    plt.hist(peds_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
-                    plt.title('peds_mean')
-                    plt.legend()
+                    # fig4 = plt.figure(4)
+                    # plt.hist(peds_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    # plt.title('peds_mean')
+                    # plt.legend()
                     fig5 = plt.figure(5)
-                    plt.hist(baseline_start_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    plt.hist(baseline_start_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
                     plt.title('baseline_start_mean')
                     plt.legend()
                     fig6 = plt.figure(6)
-                    plt.hist(baseline_start_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    plt.hist(baseline_start_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
                     plt.title('baseline_start_rms')
                     plt.legend()
                     fig7 = plt.figure(7)
-                    plt.hist(baseline_end_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    plt.hist(baseline_end_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
                     plt.title('baseline_end_mean')
                     plt.legend()
                     fig8 = plt.figure(8)
-                    plt.hist(baseline_end_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
+                    plt.hist(baseline_end_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
                     plt.title('baseline_end_rms')
                     plt.legend()
-                    fig9 = plt.figure(9)
-                    plt.hist(waveform_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
-                    plt.title('waveform_mean')
-                    plt.legend()
-                    fig10 = plt.figure(10)
-                    plt.hist(waveform_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
-                    plt.title('waveform_rms')
-                    plt.legend()
+                    # fig9 = plt.figure(9)
+                    # plt.hist(waveform_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
+                    # plt.title('waveform_mean')
+                    # plt.legend()
+                    # fig10 = plt.figure(10)
+                    # plt.hist(waveform_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
+                    # plt.title('waveform_rms')
+                    # plt.legend()
             except FileNotFoundError:
                 stop=0
                 print('file_not_found')
