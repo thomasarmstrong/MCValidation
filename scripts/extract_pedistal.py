@@ -24,6 +24,7 @@ class PedestalGenerator(Tool):
 
     telescopes = Int(1,help='Telescopes to include from the event file. '
                            'Default = 1').tag(config=True)
+    pixel = Int(-99, help='Which pixel to use').tag(config=True)
     output_name = Unicode('extracted_pedestals',
                           help='Name of the output extracted pedestal hdf5 '
                                'file').tag(config=True)
@@ -42,6 +43,7 @@ class PedestalGenerator(Tool):
                         window_width='PedestalGenerator.window_width',
                         t0='PedestalGenerator.t0',
                         T='PedestalGenerator.telescopes',
+                        p='PedestalGenerator.pixel',
                         o='PedestalGenerator.output_name',
                         plot_cam='PedestalGenerator.plot_cam'
                         ))
@@ -132,23 +134,42 @@ class PedestalGenerator(Tool):
                         plt.pause(plot_delay)
                     # print(event)
                     teldata = event.r1.tel[self.telescopes].waveform[0]
-                    print(teldata[100].shape)
-                    peds = teldata[:, self.t0:self.t0+self.window_width].mean(axis=1)
-                    peds2 = teldata[:, self.t0:self.t0+self.window_width].std(axis=1)
-                    peds_sdev.append(peds2)
-                    peds_mean.append(peds)
-                    peds_all.append(teldata[:, self.t0:self.t0+self.window_width])
-                    for i in range(2048):
-                        maxpeak.append(max(teldata[i]))
-                    if debug:
-                        ax2.plot(range(len(teldata[100])), teldata[100])
-                        ax2.fill_between([self.t0, self.t0+self.window_width], 0,60, color='r', alpha=0.3)
+                    # print(teldata[100].shape)
 
-                    baseline_start_mean.append(np.mean(teldata[:, 0:20], axis=1))
-                    baseline_start_rms.append(np.std(teldata[:, 0:20], axis=1))
+                    if self.pixel == -99:
+                        peds = teldata[:, self.t0:self.t0+self.window_width].mean(axis=1)
+                        peds2 = teldata[:, self.t0:self.t0+self.window_width].std(axis=1)
+                        peds_sdev.append(peds2)
+                        peds_mean.append(peds)
+                        peds_all.append(teldata[:, self.t0:self.t0+self.window_width])
+                        for i in range(2048):
+                            maxpeak.append(max(teldata[i]))
+                        if debug:
+                            ax2.plot(range(len(teldata[100])), teldata[100])
+                            ax2.fill_between([self.t0, self.t0+self.window_width], 0,60, color='r', alpha=0.3)
 
-                    baseline_end_mean.append(np.mean(teldata[:, -20:], axis=1))
-                    baseline_end_rms.append(np.std(teldata[:, -20:], axis=1))
+                        baseline_start_mean.append(np.mean(teldata[:, 0:20], axis=1))
+                        baseline_start_rms.append(np.std(teldata[:, 0:20], axis=1))
+
+                        baseline_end_mean.append(np.mean(teldata[:, -20:], axis=1))
+                        baseline_end_rms.append(np.std(teldata[:, -20:], axis=1))
+                    else:
+                        peds = np.mean(teldata[self.pixel, self.t0:self.t0 + self.window_width])
+                        peds2 = np.std(teldata[self.pixel, self.t0:self.t0 + self.window_width])
+                        peds_sdev.append(peds2)
+                        peds_mean.append(peds)
+                        peds_all.append(teldata[self.pixel, self.t0:self.t0 + self.window_width])
+                        for i in range(2048):
+                            maxpeak.append(max(teldata[i]))
+                        if debug:
+                            ax2.plot(range(len(teldata[100])), teldata[100])
+                            ax2.fill_between([self.t0, self.t0 + self.window_width], 0, 60, color='r', alpha=0.3)
+
+                        baseline_start_mean.append(np.mean(teldata[self.pixel, 0:20]))
+                        baseline_start_rms.append(np.std(teldata[self.pixel, 0:20]))
+
+                        baseline_end_mean.append(np.mean(teldata[self.pixel, -20:]))
+                        baseline_end_rms.append(np.std(teldata[self.pixel, -20:]))
 
                     waveform_mean.append(np.mean(teldata, axis=1))
                     waveform_rms.append(np.std(teldata, axis=1))
