@@ -57,8 +57,6 @@ class TriggerEffiencyGenerator(Tool):
         self.cal = None
         self.trig_eff_array = []
         self.disc_array = []
-        self.image_size_array = []
-        self.image_size_array_err = []
     def setup(self):
         kwargs = dict(config=self.config, tool=self)
         self.dl0 = CameraDL0Reducer(**kwargs)
@@ -95,12 +93,10 @@ class TriggerEffiencyGenerator(Tool):
             print(file_name)
 
             n_trig = 0
-            image_size = []
             try:
                 print('trying to open file')
                 source = EventSourceFactory.produce(input_url=file_name, max_events=self.max_events)
                 for event in tqdm(source):
-                    image_size.append(sum(event.mc.tel[self.telescopes].photo_electron_image))
                     n_trig = n_trig + 1
 
             except FileNotFoundError:
@@ -109,8 +105,6 @@ class TriggerEffiencyGenerator(Tool):
             trig_eff.append(n_trig/run_list[5][n])
             self.trig_eff_array.append(n_trig/run_list[5][n])
             self.disc_array.append(run_list[7][n])
-            self.image_size_array.append(np.mean(image_size))
-            self.image_size_array_err.append(np.std(image_size))
             # exit()
         plt.plot(n_pe, trig_eff )
         plt.show()
@@ -125,7 +119,7 @@ class TriggerEffiencyGenerator(Tool):
     def finish(self):
         out_file = open(self.output_name, 'w')
         for n,i in enumerate(self.trig_eff_array):
-            out_file.write('%s\t%s\t%s\n' % (self.image_size_array[n], self.image_size_array_err[n], i))
+            out_file.write('%s\t%s\n' % (self.disc_array[n], i))
         out_file.close()
         print('done')
 
