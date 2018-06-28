@@ -206,7 +206,7 @@ def main():
 
     except TypeError as e:
         print(e, ' runfile appears to only have one line')
-        exit()
+        # exit()
         run_corsika_simtel_noloop(args, infile)
 
 
