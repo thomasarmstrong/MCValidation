@@ -38,7 +38,6 @@ class TriggerEffiencyGenerator(Tool):
                         max_events='TriggerEffiencyGenerator.max_events',
                         clip_amplitude='CameraDL1Calibrator.clip_amplitude',
                         radius='CameraDL1Calibrator.radius',
-                        max_pe='TriggerEffiencyGenerator.max_pe',
                         T='TriggerEffiencyGenerator.telescopes',
                         plot_cam='TriggerEffiencyGenerator.plot_cam',
                         use_true_pe='TriggerEffiencyGenerator.use_true_pe'
