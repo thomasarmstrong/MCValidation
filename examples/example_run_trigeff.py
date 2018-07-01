@@ -31,7 +31,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           #" --fixCorsika "
           " --cores 10 "
           " --nsb 0.005 "
-          " --discthresh File "
+          " --discthresh 20.0 "
           " --extra_opts \" "
           " -C CAMERA_CONFIG_FILE=/home/armstrongt/Software/CTA/MCValidation/configs/camera_CHEC-S_prototype_26042018_masked.dat "
           " -C quantum_efficiency=/scratch/armstrongt/Workspace/CTA/MCValidation/data/config/camera/10_quantumEfficiency/S10362-11-050U-3V-format.dat "
