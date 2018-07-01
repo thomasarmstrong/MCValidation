@@ -99,7 +99,11 @@ class TriggerEffiencyGenerator(Tool):
                 print('trying to open file')
                 source = EventSourceFactory.produce(input_url=file_name, max_events=self.max_events)
                 for event in tqdm(source):
-                    image_size.append(sum(event.mc.tel[self.telescopes].photo_electron_image))
+                    im_temp=[]
+                    print('\n\n!!!Warning This is hardcoded for a pixel mask!!!\n\n')
+                    for ipix in [1385,1386,1337,1338,1339,1290,1291,1292,1243,1244]:
+                        im_temp.append(event.mc.tel[self.telescopes].photo_electron_image[ipix])
+                    image_size.append(sum(im_temp))
                     n_trig = n_trig + 1
 
             except FileNotFoundError:

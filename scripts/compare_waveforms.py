@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from ctapipe.io import event_source
 import argparse
-
+from ctapipe.calib.camera.dl0 import CameraDL0Reducer
+from ctapipe.calib.camera.dl1 import CameraDL1Calibrator
 import numpy as np
 
 parser = argparse.ArgumentParser(description='Run LightEmission and simtel')
@@ -44,6 +45,7 @@ if args.labfile is not None and args.mcfile is not None:
 
 ######### CAMERA DATA p.e. ###########
 cal = CameraCalibrator()
+
 try:
     if args.labfile is not None:
         for event_r1 in tqdm(event_source(args.labfile, max_events=args.maxevents), total = args.maxevents):
@@ -72,10 +74,14 @@ except FileNotFoundError:
 
 ######### MC DATA p.e. ###########
 cal2 = CameraCalibrator()
+dl0 = CameraDL0Reducer()
+dl1 = CameraDL1Calibrator()
 try:
     if args.mcfile is not None:
         for event_mc2 in tqdm(event_source(args.mcfile, max_events=args.maxevents), total=args.maxevents):
             cal2.calibrate(event_mc2)
+            dl0.reduce(event_mc2)
+            dl1.calibrate(event_mc2)
             print('\n\nMonte Carlo Event\n\n')
             for tel in event_mc2.r1.tels_with_data:
                 geom = event_mc2.inst.subarray.tel[tel].camera
