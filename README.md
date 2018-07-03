@@ -25,6 +25,11 @@ of photo-electrons.
 
 
 See the script get_photons.py which reads in a run list and provides the required number of photons emitted in LightEmission package to obtain the desired p.e. level.
+
+```
+python get_photons.py --runfile <File> --outfile <File> --pdefile <File> --transmission <File> --wavelength 400 --camera CHEC --ls_distance 1.5 --angular_distribution <File>
+```
+
 Looking at the distribution of true mc p.e. recorded from the simulation compared to the requested input (see following image), we see that they agree reasonably well.
 There is, as is expected a slight bias due to the geometry and, in this case the curved focal plane, where we expect to see fewer photo-electrons
 towards the edge of the camera.
