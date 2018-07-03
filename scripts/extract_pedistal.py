@@ -13,8 +13,6 @@ from traitlets import Dict, List, Int, Unicode, Bool
 from ctapipe.image.charge_extractors import ChargeExtractorFactory
 from os import listdir
 
-debug = True
-
 ###### ToDo Define inputs via some sort of argparser, for now hardcode
 
 class PedestalGenerator(Tool):
@@ -24,7 +22,7 @@ class PedestalGenerator(Tool):
 
     telescopes = Int(1,help='Telescopes to include from the event file. '
                            'Default = 1').tag(config=True)
-    pixel = Int(-99, help='Which pixel to use').tag(config=True)
+    pixel = Int(None, allow_none=True, help='Which pixel to use, defaul = all').tag(config=True)
     output_name = Unicode('extracted_pedestals',
                           help='Name of the output extracted pedestal hdf5 '
                                'file').tag(config=True)
@@ -32,11 +30,11 @@ class PedestalGenerator(Tool):
 
     max_events = Int(1, help='Maximum number of events to use').tag(config=True)
 
-    plot_cam = Bool(False, "enable plotting of individual camera").tag(config=True)
-
     t0 = Int(0, help='Timeslice to start pedestal').tag(config=True)
 
     window_width = Int(10, help='length of window within which to determine pedestal').tag(config=True)
+
+    debug = Bool(False, "plot resulting histograms").tag(config=True)
 
     aliases = Dict(dict(input_path='PedestalGenerator.input_path',
                         max_events='PedestalGenerator.max_events',
@@ -45,7 +43,7 @@ class PedestalGenerator(Tool):
                         T='PedestalGenerator.telescopes',
                         p='PedestalGenerator.pixel',
                         o='PedestalGenerator.output_name',
-                        plot_cam='PedestalGenerator.plot_cam'
+                        dd='PedestalGenerator.debug'
                         ))
     classes = List([EventSourceFactory,
                     HESSIOEventSource,
@@ -62,198 +60,144 @@ class PedestalGenerator(Tool):
         self.dl0 = None
         self.dl1 = None
         self.cal = None
+        self.run_list = None
+        self.file_list = None
         self.baseline_bins = np.arange(0,7, 7/17.)
         self.baseline_start_rms = []
         self.baseline_start_mean =[]
-
+        self.baseline_end_rms = []
+        self.baseline_end_mean =[]
+        self.waveform_rms = []
+        self.waveform_mean =[]
+        self.pltnsb = [0.01,0.05,0.100,0.200,0.300,0.500]
 
     def setup(self):
         kwargs = dict(config=self.config, tool=self)
+        self.run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
+        self.file_list = listdir('%s' % self.input_path)
+
         self.dl0 = CameraDL0Reducer(**kwargs)
 
         self.dl1 = CameraDL1Calibrator(**kwargs)
 
-        self.cal = CameraCalibrator()
+        self.cal = CameraCalibrator(eventsource=EventSourceFactory.produce(input_url ="%s/%s" % (self.input_path, self.file_list[0]),max_events=1))
 
 
     def start(self):
-        run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
-        file_list = listdir('%s' % self.input_path)
-        file_list.sort()
-        plot_cam = False
-        plot_delay = 0.5
-        disp = None
 
-        pltnsb = [0.01,0.05,0.100,0.200,0.300,0.500]
-        if debug:
-            fig=plt.figure(1)
-            ax=fig.add_subplot(111)
-            fig2 = plt.figure(2)
 
-        for n, run in enumerate(run_list[0]):
+        for n, run in enumerate(self.run_list[0]):
 
-            if run_list[6][n] not in pltnsb:
+            self.baseline_start_rms.append([])
+            self.baseline_start_mean.append([])
+            self.baseline_end_rms.append([])
+            self.baseline_end_mean.append([])
+            self.waveform_rms.append([])
+            self.waveform_mean.append([])
+
+            if self.run_list[6][n] not in self.pltnsb:
                 print('lets save some time!')
                 continue
-            if debug:
-                ax2 = fig2.add_subplot(7,8,n+1)
             #check
-            if str(int(run)) not in file_list[n]:
-                print(str(int(run)), file_list[n])
+            if str(int(run)) not in self.file_list[n]:
+                print(str(int(run)), self.file_list[n])
                 print('check runlist.txt order, needs to be sorted?')
-                exit()
-            file_name = "%s/%s" % (self.input_path, file_list[n])
+                self.file_list.sort()
+                if str(int(run)) not in self.file_list[n]:
+                    print('Sorting didn\'t seem to help, giving up.')
+                    exit()
+                else:
+                    print('Sorted and sorted.')
+            file_name = "%s/%s" % (self.input_path, self.file_list[n])
             print(file_name)
+
+
 
 
             try:
                 source = EventSourceFactory.produce(input_url =file_name, max_events=self.max_events)
-                true_pe = []
-                # lab_pe = []
-                peds_sdev = []
-                peds_all = []
-                peds_mean = []
-                maxpeak=[]
-
-                baseline_start_mean = []
-                baseline_start_rms = []
-
-                baseline_end_mean = []
-                baseline_end_rms = []
-
-                waveform_mean = []
-                waveform_rms = []
 
                 for event in tqdm(source):
                     self.cal.calibrate(event)
                     self.dl0.reduce(event)
                     self.dl1.calibrate(event)
-                    input_pe = run_list[3][n]
-                    input_nsb = run_list[6][n]
 
-                    if self.plot_cam == True:
-                        if disp is None:
-                            geom = event.inst.subarray.tel[self.telescopes].camera
-                            disp = CameraDisplay(geom)
-                            disp.add_colorbar()
-                            plt.show(block=False)
-                        im = event.dl1.tel[self.telescopes].image[0]
-                        disp.image = im
-                        plt.pause(plot_delay)
-                    # print(event)
                     teldata = event.r1.tel[self.telescopes].waveform[0]
-                    # print(teldata[100].shape)
 
-                    if self.pixel == -99:
-                        peds = teldata[:, self.t0:self.t0+self.window_width].mean(axis=1)
-                        peds2 = teldata[:, self.t0:self.t0+self.window_width].std(axis=1)
-                        peds_sdev.append(peds2)
-                        peds_mean.append(peds)
-                        peds_all.append(teldata[:, self.t0:self.t0+self.window_width])
-                        for i in range(2048):
-                            maxpeak.append(max(teldata[i]))
-                        if debug:
-                            ax2.plot(range(len(teldata[100])), teldata[100])
-                            ax2.fill_between([self.t0, self.t0+self.window_width], 0,60, color='r', alpha=0.3)
+                    if self.pixel is None:
 
-                        baseline_start_mean.append(np.mean(teldata[:, 0:20], axis=1))
-                        baseline_start_rms.append(np.std(teldata[:, 0:20], axis=1))
+                        self.baseline_start_mean[n].append(np.mean(teldata[:, 0:20], axis=1))
+                        self.baseline_start_rms[n].append(np.std(teldata[:, 0:20], axis=1))
 
-                        baseline_end_mean.append(np.mean(teldata[:, -20:], axis=1))
-                        baseline_end_rms.append(np.std(teldata[:, -20:], axis=1))
+                        self.baseline_end_mean[n].append(np.mean(teldata[:, -20:], axis=1))
+                        self.baseline_end_rms[n].append(np.std(teldata[:, -20:], axis=1))
+
+                        self.waveform_mean[n].append(np.mean(teldata, axis=1))
+                        self.waveform_rms[n].append(np.std(teldata, axis=1))
                     else:
-                        # peds = np.mean(teldata[self.pixel, self.t0:self.t0 + self.window_width])
-                        # peds2 = np.std(teldata[self.pixel, self.t0:self.t0 + self.window_width])
-                        # peds_sdev.append(peds2)
-                        # peds_mean.append(peds)
-                        # peds_all.append(teldata[self.pixel, self.t0:self.t0 + self.window_width])
-                        # for i in range(2048):
-                        maxpeak.append(max(teldata[self.pixel]))
-                        # if debug:
-                        #     ax2.plot(range(len(teldata[100])), teldata[100])
-                        #     ax2.fill_between([self.t0, self.t0 + self.window_width], 0, 60, color='r', alpha=0.3)
 
-                        baseline_start_mean.append(np.mean(teldata[self.pixel, 0:20]))
-                        baseline_start_rms.append(np.std(teldata[self.pixel, 0:20]))
+                        self.baseline_start_mean[n].append(np.mean(teldata[self.pixel, 0:20]))
+                        self.baseline_start_rms[n].append(np.std(teldata[self.pixel, 0:20]))
 
-                        baseline_end_mean.append(np.mean(teldata[self.pixel, -20:]))
-                        baseline_end_rms.append(np.std(teldata[self.pixel, -20:]))
+                        self.baseline_end_mean[n].append(np.mean(teldata[self.pixel, -20:]))
+                        self.baseline_end_rms[n].append(np.std(teldata[self.pixel, -20:]))
 
-                    # waveform_mean.append(np.mean(teldata, axis=1))
-                    # waveform_rms.append(np.std(teldata, axis=1))
+                        self.waveform_mean[n].append(np.mean(teldata[self.pixel, :]))
+                        self.waveform_rms[n].append(np.std(teldata[self.pixel, :]))
 
 
-                    # plt.hist(peds,bins=50, alpha=0.9)
-                    # plt.show()
-                    # print(teldata)
-                    # plt.plot(range(len(teldata[100])), teldata[100])
-                    # plt.show()
-                    # exit()
-                # print(np.mean(peds_all), np.std(peds_all))
-                # exit()
-                    # true_charge_mc = event.mc.tel[self.telescopes].photo_electron_image
-                    # measured_charge = event.dl1.tel[self.telescopes].image[0]
-                    # true_charge_lab = np.asarray([input_pe]*len(measured_charge))
-                    # true_pe.append(true_charge_mc)
-                    # if self.use_true_pe:
-                    #     true_charge=true_charge_mc
-                    # else:
-                    #     true_charge=true_charge_lab.astype(int)
-                    #
-                    # self.calculator.add_charges(true_charge, measured_charge)
-
-                if debug and run_list[6][n] in pltnsb:
-                    # ax.hist(peds_sdev, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
-                    # # plt.errorbar(input_nsb, np.mean(peds_all), np.std(peds_all), marker ='x',color='k')
-                    # # plt.scatter(input_nsb, np.std(peds_all), marker ='x',color='k')
-                    # ax.set_xlabel('Non pulsed background light [GHz]')
-                    # ax.set_ylabel('Pedistal mean')
-                    fig3 = plt.figure(3)
-                    plt.hist(maxpeak, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    plt.title('maxpeak')
-                    plt.legend()
-                    # fig4 = plt.figure(4)
-                    # plt.hist(peds_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(100*run_list[6][n]))
-                    # plt.title('peds_mean')
-                    # plt.legend()
-                    fig5 = plt.figure(5)
-                    plt.hist(baseline_start_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    plt.title('baseline_start_mean')
-                    plt.legend()
-                    fig6 = plt.figure(6)
-                    plt.hist(baseline_start_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    plt.title('baseline_start_rms')
-                    plt.legend()
-                    fig7 = plt.figure(7)
-                    plt.hist(baseline_end_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    plt.title('baseline_end_mean')
-                    plt.legend()
-                    fig8 = plt.figure(8)
-                    plt.hist(baseline_end_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    plt.title('baseline_end_rms')
-                    plt.legend()
-                    # fig9 = plt.figure(9)
-                    # plt.hist(waveform_mean, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    # plt.title('waveform_mean')
-                    # plt.legend()
-                    # fig10 = plt.figure(10)
-                    # plt.hist(waveform_rms, bins=50, alpha=0.9, histtype='step', label = '%s MHz' % str(1000*run_list[6][n]))
-                    # plt.title('waveform_rms')
-                    # plt.legend()
             except FileNotFoundError:
                 stop=0
                 print('file_not_found')
-        plt.show()
-        # if debug:
-        #     plt.xscale('log')
-        #     plt.yscale('log')
-        #     plt.plot([0,1000],[0,1000], 'k:')
-        #     plt.xlabel('Input p.e.')
-        #     plt.ylabel('True mc p.e.')
-        #     plt.show()
     def finish(self):
-        # out_file = '%s/charge_resolution_test.h5' % self.input_path
-        # self.calculator.save(self.output_name)
+        if self.debug:
+
+            fig1 = plt.figure(1)
+            ax1 = fig1.add_subplot(111)
+            fig2 = plt.figure(2)
+            ax2 = fig2.add_subplot(111)
+            fig3 = plt.figure(3)
+            ax3 = fig3.add_subplot(111)
+            fig4 = plt.figure(4)
+            ax4 = fig4.add_subplot(111)
+            fig5 = plt.figure(5)
+            ax5 = fig5.add_subplot(111)
+            fig6 = plt.figure(6)
+            ax6 = fig6.add_subplot(111)
+
+
+            for n in range(len(self.baseline_start_rms)):
+                if len(self.baseline_start_mean[n])>0:
+                    ax1.hist(self.baseline_start_mean[n], bins=50, alpha=0.9, histtype='step',
+                             label='%s MHz' % str(1000 * self.run_list[6][n]))
+                    ax2.hist(self.baseline_start_rms[n], bins=50, alpha=0.9, histtype='step',
+                             label='%s MHz' % str(1000 * self.run_list[6][n]))
+                    ax3.hist(self.baseline_end_mean[n], bins=50, alpha=0.9, histtype='step',
+                             label='%s MHz' % str(1000 * self.run_list[6][n]))
+                    ax4.hist(self.baseline_end_rms[n], bins=50, alpha=0.9, histtype='step',
+                             label='%s MHz' % str(1000 * self.run_list[6][n]))
+                    ax5.hist(self.waveform_mean[n], bins=50, alpha=0.9, histtype='step',
+                             label='%s MHz' % str(1000*self.run_list[6][n]))
+                    ax6.hist(self.waveform_rms[n], bins=50, alpha=0.9, histtype='step',
+                             label='%s MHz' % str(1000*self.run_list[6][n]))
+
+            ax1.set_title('baseline_start_mean')
+            ax2.set_title('baseline_start_rms')
+            ax3.set_title('baseline_end_mean')
+            ax4.set_title('baseline_end_rms')
+            ax5.set_title('waveform_mean')
+            ax6.set_title('waveform_rms')
+
+            ax1.legend()
+            ax2.legend()
+            ax3.legend()
+            ax4.legend()
+            ax5.legend()
+            ax6.legend()
+            plt.show()
+
+
+
         print('Done!')
 
 def main():
