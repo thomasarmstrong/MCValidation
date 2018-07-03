@@ -55,6 +55,9 @@ python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 -
 --distance 100 --camradius 30 --runSimTelarray --nsb 0 --discthresh 0
 ```
 
+Note: for a lot of test measurements, it should be possible to set the transmission and pde to 100% which should just result in fewer photons being simulated
+(i.e. save some cpu and storage space)
+
 Additionally, there are some helper scripts for the helper script... (the example...py). But these are mainly here to keep track
 of some different runs performed and will be replaced with config files shortly (see issue #2).
 
@@ -62,7 +65,19 @@ of some different runs performed and will be replaced with config files shortly 
 
 For this work, we assume that the data is organised as separate runs (RunX.format) in a folder which has a corresponding
 runlist.dat, where the dat file contains columns describing the data run (RunNumber, Filterwheel_position, Filterwheel_attenuation,
-Npe, Nphotons*, Nevents, NSB+noise, discriminator_threshold)
+Npe, Nphotons*, Nevents, NSB+noise, discriminator_threshold) e.g.
+
+```
+#run_number     fw_pos  fw_atten    pe_expected     ph_required     n_events    NSB     disc_thresh
+43469           2782    2.51189     1008.67         23685422.72     100         0.005   20
+43470           2756    2.81838     898.98          21109700.22     100         0.005   20
+43471           2728    3.16228     801.21          18813881.19     100         0.005   20
+...             ...     ...         ...             ...             ...         ...     ...
+```
+
+Where fw_pos, fw_atten are not used at the moment
+
+
 
 In order to read in data from the different cameras, readers in ctapipe need to be implemented and if necessary the
 relevant camera softwehere needs to be installed.
@@ -235,3 +250,9 @@ ___
 ## Lab measurements not covered above
 
 Rate scan?
+
+# Lessons Learned
+
+## Generating SPE input
+
+For CHEC-S we measured the SPE in the lab, fit using a Gentile Fitter to obtain the relevant parameters. TODO
