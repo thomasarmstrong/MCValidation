@@ -376,7 +376,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C quantum_efficiency=/scratch/armstrongt/Workspace/CTA/MCValidation/data/config/camera/10_quantumEfficiency/S10362-11-050U-3V-format.dat "
           " -C discriminator_pulse_shape=/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/15_pulseShape/disc_shape_CHEC-S_27042018.dat "
           " -C fadc_pulse_shape=/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/15_pulseShape/pulse_CHEC-S_FADC_27042018.dat "
-          " -C pm_photoelectron_spectrum=/home/armstrongt/Software/CTA/MCValidation/configs/checs_spe_spectrum_normalised.txt "
+          " -C pm_photoelectron_spectrum=/home/armstrongt/Software/CTA/MCValidation/configs/checs_spe_spectrum_long_norm.txt "
           " -C pm_voltage_variation=0 "
           " -C gain_variation=0.1 "
           " -C QE_variation=0.1 "
