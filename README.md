@@ -25,6 +25,11 @@ of photo-electrons.
 
 
 See the script get_photons.py which reads in a run list and provides the required number of photons emitted in LightEmission package to obtain the desired p.e. level.
+
+```
+python get_photons.py --runfile <File> --outfile <File> --pdefile <File> --transmission <File> --wavelength 400 --camera CHEC --ls_distance 1.5 --angular_distribution <File>
+```
+
 Looking at the distribution of true mc p.e. recorded from the simulation compared to the requested input (see following image), we see that they agree reasonably well.
 There is, as is expected a slight bias due to the geometry and, in this case the curved focal plane, where we expect to see fewer photo-electrons
 towards the edge of the camera.
@@ -50,6 +55,9 @@ python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 -
 --distance 100 --camradius 30 --runSimTelarray --nsb 0 --discthresh 0
 ```
 
+Note: for a lot of test measurements, it should be possible to set the transmission and pde to 100% which should just result in fewer photons being simulated
+(i.e. save some cpu and storage space)
+
 Additionally, there are some helper scripts for the helper script... (the example...py). But these are mainly here to keep track
 of some different runs performed and will be replaced with config files shortly (see issue #2).
 
@@ -57,7 +65,19 @@ of some different runs performed and will be replaced with config files shortly 
 
 For this work, we assume that the data is organised as separate runs (RunX.format) in a folder which has a corresponding
 runlist.dat, where the dat file contains columns describing the data run (RunNumber, Filterwheel_position, Filterwheel_attenuation,
-Npe, Nphotons*, Nevents, NSB+noise, discriminator_threshold)
+Npe, Nphotons*, Nevents, NSB+noise, discriminator_threshold) e.g.
+
+```
+#run_number     fw_pos  fw_atten    pe_expected     ph_required     n_events    NSB     disc_thresh
+43469           2782    2.51189     1008.67         23685422.72     100         0.005   20
+43470           2756    2.81838     898.98          21109700.22     100         0.005   20
+43471           2728    3.16228     801.21          18813881.19     100         0.005   20
+...             ...     ...         ...             ...             ...         ...     ...
+```
+
+Where fw_pos, fw_atten are not used at the moment
+
+
 
 In order to read in data from the different cameras, readers in ctapipe need to be implemented and if necessary the
 relevant camera softwehere needs to be installed.
@@ -78,6 +98,7 @@ The output should look something like:
 
 ![example waveform](Figures/compare_waveform.png)
 
+This script can also be passed just one file if desired.
 
 
 
@@ -100,6 +121,8 @@ from the document followed by description of the method(s) that will be implemen
 To simulate this, there are now two methods. 1) Simply use a dummy corsika event (such as one created by the flatfielding
 code with only 1 photon) and increase the NSB parameter, or 2) use the new NSB code, nsbls, available with the LightEmission
 package.
+
+See code extract_pedistal.py
 
 ## Basic Photo-Sensor Response
 
@@ -165,11 +188,15 @@ source simulation.
 
 exctract_charge_resolution.py
 
+```
 python extract_charge_resolution.py --input_path ./d2018-02-09_DynRange_NSB0_mc --max_events 10 -o ./charge_resolution_test.h5 --calibrator HESSIOR1Calibrator -T 1 --plot_cam False --use_true_pe True
+```
 
 result can be plotted using
 
+```
 python .../ctapipe/ctapipe/tools/plot_charge_resolution.py -f="['./charge_resolution_true_pe.h5', './charge_resolution_labpe.h5']"  -O ./comp_charge_res.png
+```
 
 ![comp charge res](Figures/compare_charge_res.png)
 
@@ -230,3 +257,9 @@ ___
 ## Lab measurements not covered above
 
 Rate scan?
+
+# Lessons Learned
+
+## Generating SPE input
+
+For CHEC-S we measured the SPE in the lab, fit using a Gentile Fitter to obtain the relevant parameters. TODO
