@@ -403,7 +403,7 @@ import os
 # New Parameters
 #
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_spe_spectrum/runlist.txt "
-          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/new_params "
+          " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/new_params2 "
           " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
@@ -422,7 +422,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C QE_variation=0.09 "
           " -C FADC_PEDESTAL=10000 "
           " -C FADC_AMPLITUDE=2.77 "
-          " -C FADC_Noise=0.78 "
+          " -C FADC_Noise=1.4 "
           " -C FADC_var_pedestal=0.07 "
           " -C FADC_SUM_OFFSET=15 "
           " -C FADC_Sum_Bins=96 "
