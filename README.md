@@ -122,6 +122,8 @@ To simulate this, there are now two methods. 1) Simply use a dummy corsika event
 code with only 1 photon) and increase the NSB parameter, or 2) use the new NSB code, nsbls, available with the LightEmission
 package.
 
+See code extract_pedistal.py
+
 ## Basic Photo-Sensor Response
 
 > For normal incidence the PDE (photon detection efficiency) for SiPM at the bias voltage as used
