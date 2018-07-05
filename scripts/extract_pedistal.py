@@ -126,14 +126,14 @@ class PedestalGenerator(Tool):
 
                     if self.pixel is None:
 
-                        self.baseline_start_mean[n].append(np.mean(teldata[:, 0:20], axis=1))
-                        self.baseline_start_rms[n].append(np.std(teldata[:, 0:20], axis=1))
+                        self.baseline_start_mean[n].append(np.mean(np.mean(teldata[:, 0:20], axis=1)))
+                        self.baseline_start_rms[n].append(np.mean(np.std(teldata[:, 0:20], axis=1)))
 
-                        self.baseline_end_mean[n].append(np.mean(teldata[:, -20:], axis=1))
-                        self.baseline_end_rms[n].append(np.std(teldata[:, -20:], axis=1))
+                        self.baseline_end_mean[n].append(np.mean(np.mean(teldata[:, -20:], axis=1)))
+                        self.baseline_end_rms[n].append(np.mean(np.std(teldata[:, -20:], axis=1)))
 
-                        self.waveform_mean[n].append(np.mean(teldata, axis=1))
-                        self.waveform_rms[n].append(np.std(teldata, axis=1))
+                        self.waveform_mean[n].append(np.mean(np.mean(teldata, axis=1)))
+                        self.waveform_rms[n].append(np.mean(np.std(teldata, axis=1)))
                     else:
 
                         self.baseline_start_mean[n].append(np.mean(teldata[self.pixel, 0:20]))
@@ -168,17 +168,17 @@ class PedestalGenerator(Tool):
 
             for n in range(len(self.baseline_start_rms)):
                 if len(self.baseline_start_mean[n])>0:
-                    ax1.hist(self.baseline_start_mean[n], bins=50, alpha=0.9, histtype='step',
+                    ax1.hist(self.baseline_start_mean[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000 * self.run_list[6][n]))
-                    ax2.hist(self.baseline_start_rms[n], bins=50, alpha=0.9, histtype='step',
+                    ax2.hist(self.baseline_start_rms[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000 * self.run_list[6][n]))
-                    ax3.hist(self.baseline_end_mean[n], bins=50, alpha=0.9, histtype='step',
+                    ax3.hist(self.baseline_end_mean[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000 * self.run_list[6][n]))
-                    ax4.hist(self.baseline_end_rms[n], bins=50, alpha=0.9, histtype='step',
+                    ax4.hist(self.baseline_end_rms[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000 * self.run_list[6][n]))
-                    ax5.hist(self.waveform_mean[n], bins=50, alpha=0.9, histtype='step',
+                    ax5.hist(self.waveform_mean[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000*self.run_list[6][n]))
-                    ax6.hist(self.waveform_rms[n], bins=50, alpha=0.9, histtype='step',
+                    ax6.hist(self.waveform_rms[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000*self.run_list[6][n]))
 
             ax1.set_title('baseline_start_mean')
