@@ -9,20 +9,19 @@ corsika_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2017-12-08_testin
 lightEmission_path = '/scratch/armstrongt/Workspace/CTA/MCValidation/src/LightEmission-pkg'
 
 
-def make_mask(on_pixels, cam_file, out_file):
-    for line in cam_file:
-        if line.startswith('Pixel'):
-            data = line.strip().split(' ')
-            if int(data[0].split('\t')[1]) in on_pixels:
-                out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + data[4] + ' ' + '1\n')
-            else:
-                out_file.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] + ' ' + data[4] + ' ' + '0\n')
-        else:
-            out_file.write(line)
-
 
 def run_simtel(outfile='../data/bypass2_enoise.simtel.gz', nsb=0.02, disc_thresh=230, extra_opts=' ',
                infile='/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
+    """
+    Simple helper script to launch sim_telarray (as with command line)
+    :param outfile: Name of output simtelarray file
+    :param nsb: Value of NSB to use [GHz]
+    :param disc_thresh: Value of discriminator threshold to use in triggering [units are nominally p.e. but depends on 
+    definition of discriminator amplitude
+    :param extra_opts: Any extra options to pass to sim_telarray, should be in format -C PARAMETER=VALUE
+    :param infile: name of corsika file to use
+    :return: None
+    """
     os.system('%s/sim_telarray '
               '-c /%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg '
               '-o %s '
@@ -42,6 +41,19 @@ def run_simtel(outfile='../data/bypass2_enoise.simtel.gz', nsb=0.02, disc_thresh
 def run_lightemission(events=3, photons=10946249, distance=100, cam_radius=30, xdisp=0, ydisp=0, spectrum=405,
                       ang_dist='/scratch/armstrongt/Workspace/CTA/MCValidation/data/ang_dist_2.dat',
                       out_file='/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
+    """
+    Simple helper script to launch the ff-1m script part of the LightEmission package
+    :param events: Number of events to simulate
+    :param photons: Number of photons to produce (this is the total number and should be calculated based on the desired p.e./pixel)
+    :param distance: distance of light source to camera focal plane [cm]
+    :param cam_radius: radius of fiducial sphere that contains the camera focal plane [cm]
+    :param xdisp: displacement of light source in the x direction [cm]
+    :param ydisp: displacement of light source in the y dierection [cm]
+    :param spectrum: wavelength of light source to use if singular value, or distribution if file is provided
+    :param ang_dist: angular distribution of light source
+    :param out_file: name of the output file.
+    :return: None
+    """
     os.system('%s/ff-1m '
               '--events %s '
               '--photons %s '
@@ -54,12 +66,17 @@ def run_lightemission(events=3, photons=10946249, distance=100, cam_radius=30, x
 
 
 def run_corsika_simtel(params):
+    """
+    function for running the helper function, separated out for multiprocessing reasons
+    :param params: input command line options
+    :return: returns name of output file
+    """
+    #################### CORSIKA STEP ###################
+
     args,infile,n,p = params
     if not args.fixCorsika:
-        # infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
-        # else:
+        # Continue with normal loop, corsika file generated for each line in runlist
         infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][n]))
-
         if args.runLightEmission:
             print("@@@@ Running LightEmission Package\n\n")
             if args.nevents == "File":
@@ -73,7 +90,11 @@ def run_corsika_simtel(params):
                                   distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
                                   ydisp=args.ydisp)
     else:
+        # Keep corsika name fixed to first line of runlist
         infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
+
+
+    #################### SIMTEL STEP ###################
 
     outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(infile[0][n]))
     if args.runSimTelarray:
@@ -92,12 +113,21 @@ def run_corsika_simtel(params):
             else:
                 run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
                            extra_opts=args.extra_opts)
-
     return ('run%04d.simtel.gz' % int(infile[0][n]), 0 )
 
+
+
 def run_corsika_simtel_noloop(args, infile):
+    """
+    function for running the helper function, only called if runlist only has a single line.
+    :param args: input command line options
+    :param infile: name of the input CORSIKA file
+    :return: 0
+    """
     infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0]))
     outfl = '%s/sim_tel/run%04d.simtel.gz' % (args.outdir, int(infile[0]))
+
+    #################### CORSIKA STEP ###################
     if args.runLightEmission:
         print("@@@@ Running LightEmission Package\n\n")
         if args.nevents == "File":
@@ -108,6 +138,8 @@ def run_corsika_simtel_noloop(args, infile):
             run_lightemission(events=args.nevents, photons=infile[4],
                               out_file=infl, ang_dist=args.angdist,
                               distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp, ydisp=args.ydisp)
+
+    #################### SIMTEL STEP ###################
     if args.runSimTelarray:
         print("@@@@ Running Simtelarray\n\n")
         if args.discthresh == "File":
@@ -126,7 +158,11 @@ def run_corsika_simtel_noloop(args, infile):
                            extra_opts=args.extra_opts)
     return 0
 
+
+
 def main():
+
+    #Check if you need to set hardcoded path
     if not os.path.isdir(simtel_path) or not os.path.isdir(simtel_path) or not os.path.isdir(lightEmission_path):
         print('Need to set paths (hardcoded!)')
 
@@ -154,6 +190,7 @@ def main():
     parser.add_argument('--cores', default=None, help='Multiprocessing, how many cores to use')
     args = parser.parse_args()
 
+    # if path to output data does not exist, create it.
     if not os.path.isdir(args.outdir):
         os.makedirs(args.outdir)
     if not os.path.isdir('%s/corsika/' % (args.outdir)):
@@ -169,7 +206,9 @@ def main():
         print('No such input file, please specify one with --infile FILE')
 
     try:
+        # Try and loop over runlist file.
         if args.fixCorsika:
+            ## Needs to be outside multiprocessing loop as only needs to be run once.
             print('Only running CORSIKA once')
             infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][0]))
             if args.runLightEmission:
@@ -185,7 +224,6 @@ def main():
                                       distance=args.distance, cam_radius=args.camradius, xdisp=args.xdisp,
                                       ydisp=args.ydisp)
 
-
         if args.cores is None:
             for n, p in enumerate(infile[3]):
                 run_corsika_simtel(args, infile, n, p)
@@ -195,18 +233,11 @@ def main():
             print('using %s out of %s cores' % (args.cores, multiprocessing.cpu_count()))
             for n, p in enumerate(infile[3]):
                 tasks.append((args, infile, n, p))
-            #print(tasks)
-            #results = [pool.map_async(run_corsika_simtel, t) for t in tasks]
 
             print(pool.map(run_corsika_simtel, tasks))
 
-            #for result in results:
-             #   (fl, res) = result.get()
-              #  print('File %s run, with exit status %s' % (fl,res))
-
     except TypeError as e:
         print(e, ' runfile appears to only have one line')
-        # exit()
         run_corsika_simtel_noloop(args, infile)
 
 
