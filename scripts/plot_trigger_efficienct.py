@@ -5,6 +5,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Get Trigger Efficiency Rate scan plot')
 parser.add_argument('--lightFile', default=None, help='File containing the trigger fraction for signal data')
 parser.add_argument('--noiseFile', default=None, help='File containint the trigger fraction for noise data')
+parser.add_argument('--reference', default=None, help='File containint the trigger fraction for reference data')
 parser.add_argument('--flashHz', default=10000, help='Freqency of laser pulses (Hz)')
 parser.add_argument('--noiseMHz', default=0.005, help='Assumed Noise frequency')
 parser.add_argument('--fadcMHz', default=1000, help='FADC sampling frequency (MHz)')
@@ -36,12 +37,13 @@ ax2 = ax1.twiny()
 ax2.set_xlim([0,50*(float(args.pe2mv))])
 ax2.set_xlabel('~Discriminator Threshold [mV]')
 
-lab = np.loadtxt('/Users/armstrongt/Workspace/CTA/MCValidation/data/trigger_efficiency_lab.txt', unpack=True, delimiter=',')
-plt.plot(lab[0],lab[1], color='g', label='lab measurement')
-plt.plot(-10,-10, color='b', ls='--', label='laser pulse')
-plt.plot(-10,-10, color='r', ls='--', label='non pulsed background')
-plt.plot(-10,-10, color='k', label='total rate')
-ax2.set_ylim([0,20000])
+if args.reference is not None:
+    lab = np.loadtxt(args.reference, unpack=True, delimiter=',')
+    plt.plot(lab[0],lab[1], color='g', label='lab measurement')
+    plt.plot(-10,-10, color='b', ls='--', label='laser pulse')
+    plt.plot(-10,-10, color='r', ls='--', label='non pulsed background')
+    plt.plot(-10,-10, color='k', label='total rate')
+    ax2.set_ylim([0,20000])
 
 plt.legend()
 
