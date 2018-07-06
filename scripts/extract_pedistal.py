@@ -12,6 +12,7 @@ from ctapipe.core import Tool
 from traitlets import Dict, List, Int, Unicode, Bool
 from ctapipe.image.charge_extractors import ChargeExtractorFactory
 from os import listdir
+import pandas as pd
 
 ###### ToDo Define inputs via some sort of argparser, for now hardcode
 
@@ -95,9 +96,9 @@ class PedestalGenerator(Tool):
             self.waveform_rms.append([])
             self.waveform_mean.append([])
 
-            if self.run_list[6][n] not in self.pltnsb:
-                print('lets save some time!')
-                continue
+            # if self.run_list[6][n] not in self.pltnsb:
+            #     print('lets save some time!')
+            #     continue
             #check
             if str(int(run)) not in self.file_list[n]:
                 print(str(int(run)), self.file_list[n])
@@ -165,7 +166,6 @@ class PedestalGenerator(Tool):
             fig6 = plt.figure(6)
             ax6 = fig6.add_subplot(111)
 
-
             for n in range(len(self.baseline_start_rms)):
                 if len(self.baseline_start_mean[n])>0:
                     ax1.hist(self.baseline_start_mean[n], bins=50, alpha=0.9, histtype='stepfilled',
@@ -180,6 +180,7 @@ class PedestalGenerator(Tool):
                              label='%s MHz' % str(1000*self.run_list[6][n]))
                     ax6.hist(self.waveform_rms[n], bins=50, alpha=0.9, histtype='stepfilled',
                              label='%s MHz' % str(1000*self.run_list[6][n]))
+
 
             ax1.set_title('baseline_start_mean')
             ax2.set_title('baseline_start_rms')
@@ -196,8 +197,25 @@ class PedestalGenerator(Tool):
             ax6.legend()
             plt.show()
 
+        columns_str = []
+        for n in range(len(self.baseline_start_rms)):
+            if len(self.baseline_start_mean[n]) > 0:
+                columns_str.append('%sMHz_baselineStartMean' % str(1000*self.run_list[6][n]))
+                columns_str.append('%sMHz_baselineStartRMS' % str(1000*self.run_list[6][n]))
+                columns_str.append('%sMHz_baselineEndMean' % str(1000*self.run_list[6][n]))
+                columns_str.append('%sMHz_baselineEndRMS' % str(1000*self.run_list[6][n]))
+                columns_str.append('%sMHz_baselineWaveformMean' % str(1000*self.run_list[6][n]))
+                columns_str.append('%sMHz_baselineWaveformRMS' % str(1000*self.run_list[6][n]))
+
+        out_array = np.concatenate((self.baseline_start_mean,self.baseline_start_rms,
+                                    self.baseline_end_mean, self.baseline_end_rms,
+                                    self.waveform_mean, self.waveform_rms), axis=0)
 
 
+        data = pd.DataFrame(out_array.T, columns=columns_str)
+        data.columns = data.columns.str.split('_', expand=True)
+        print(data)
+        data.to_hdf(self.output_name, 'table', append=True)
         print('Done!')
 
 def main():
