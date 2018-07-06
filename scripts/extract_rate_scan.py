@@ -101,7 +101,7 @@ class TriggerEffiencyGenerator(Tool):
 
             except FileNotFoundError:
                 print('file_not_found')
-            print(n_trig, run_list[5][n], n_trig/run_list[5][n] )
+            print(run_list[7][n], n_trig, run_list[5][n], n_trig/run_list[5][n])
             trig_eff.append(n_trig/run_list[5][n])
             self.trig_eff_array.append(n_trig/run_list[5][n])
             self.disc_array.append(run_list[7][n])

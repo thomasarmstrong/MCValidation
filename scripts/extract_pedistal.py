@@ -11,8 +11,9 @@ from ctapipe.io.eventsourcefactory import EventSourceFactory
 from ctapipe.core import Tool
 from traitlets import Dict, List, Int, Unicode, Bool
 from ctapipe.image.charge_extractors import ChargeExtractorFactory
-from os import listdir
+from os import listdir, path, makedirs
 import pandas as pd
+import os
 
 ###### ToDo Define inputs via some sort of argparser, for now hardcode
 
@@ -25,7 +26,7 @@ class PedestalGenerator(Tool):
                            'Default = 1').tag(config=True)
     pixel = Int(None, allow_none=True, help='Which pixel to use, defaul = all').tag(config=True)
     output_name = Unicode('extracted_pedestals',
-                          help='Name of the output extracted pedestal hdf5 '
+                          help='path where to store the output extracted pedestal hdf5 '
                                'file').tag(config=True)
     input_path = Unicode(help='Path to directory containing data').tag(config=True)
 
@@ -197,25 +198,36 @@ class PedestalGenerator(Tool):
             ax6.legend()
             plt.show()
 
-        columns_str = []
+        if not path.isdir(self.output_name):
+            makedirs(self.output_name)
+
+        columns_str = ['baselineStartMean', 'baselineStartRMS', 'baselineEndMean',
+                       'baselineEndRMS','baselineWaveformMean', 'baselineWaveformRMS']
         for n in range(len(self.baseline_start_rms)):
             if len(self.baseline_start_mean[n]) > 0:
-                columns_str.append('%sMHz_baselineStartMean' % str(1000*self.run_list[6][n]))
-                columns_str.append('%sMHz_baselineStartRMS' % str(1000*self.run_list[6][n]))
-                columns_str.append('%sMHz_baselineEndMean' % str(1000*self.run_list[6][n]))
-                columns_str.append('%sMHz_baselineEndRMS' % str(1000*self.run_list[6][n]))
-                columns_str.append('%sMHz_baselineWaveformMean' % str(1000*self.run_list[6][n]))
-                columns_str.append('%sMHz_baselineWaveformRMS' % str(1000*self.run_list[6][n]))
+                print(self.baseline_start_mean[n])
+                out_array = np.array([self.baseline_start_mean[n], self.baseline_start_rms[n],
+                                            self.baseline_end_mean[n], self.baseline_end_rms[n],
+                                            self.waveform_mean[n], self.waveform_rms[n]])
+                print(out_array, columns_str)
+                data = pd.DataFrame(out_array.T, columns=columns_str)
+                data.to_hdf('%s/extracted_pedestals_%sMHz.h5' % (self.output_name,str(1000*self.run_list[6][n])), 'table', append=True)
+                # columns_str.append('%sMHz_baselineStartMean' % str(1000*self.run_list[6][n]))
+                # columns_str.append('%sMHz_baselineStartRMS' % str(1000*self.run_list[6][n]))
+                # columns_str.append('%sMHz_baselineEndMean' % str(1000*self.run_list[6][n]))
+                # columns_str.append('%sMHz_baselineEndRMS' % str(1000*self.run_list[6][n]))
+                # columns_str.append('%sMHz_baselineWaveformMean' % str(1000*self.run_list[6][n]))
+                # columns_str.append('%sMHz_baselineWaveformRMS' % str(1000*self.run_list[6][n]))
 
-        out_array = np.concatenate((self.baseline_start_mean,self.baseline_start_rms,
-                                    self.baseline_end_mean, self.baseline_end_rms,
-                                    self.waveform_mean, self.waveform_rms), axis=0)
+        # out_array = np.concatenate((self.baseline_start_mean,self.baseline_start_rms,
+        #                             self.baseline_end_mean, self.baseline_end_rms,
+        #                             self.waveform_mean, self.waveform_rms), axis=0)
 
 
-        data = pd.DataFrame(out_array.T, columns=columns_str)
-        data.columns = data.columns.str.split('_', expand=True)
-        print(data)
-        data.to_hdf(self.output_name, 'table', append=True)
+        # data = pd.DataFrame(out_array.T, columns=columns_str)
+        # data.columns = data.columns.str.split('_', expand=True)
+        # print(data)
+        # data.to_hdf(self.output_name, 'table', append=True)
         print('Done!')
 
 def main():
