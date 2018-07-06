@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from ctapipe.io import event_source
 import argparse
-from ctapipe.calib.camera.dl0 import CameraDL0Reducer
-from ctapipe.calib.camera.dl1 import CameraDL1Calibrator
-import numpy as np
+from ctapipe.io.eventsourcefactory import EventSourceFactory
 
 parser = argparse.ArgumentParser(description='Run LightEmission and simtel')
 parser.add_argument('--mcfile', default=None, help='Path to mc data file')
@@ -44,10 +42,11 @@ if args.labfile is not None and args.mcfile is not None:
     ax2.set_xlabel('time [ns]')
 
 ######### CAMERA DATA p.e. ###########
-cal = CameraCalibrator()
+
 
 try:
     if args.labfile is not None:
+        cal = CameraCalibrator(eventsource=EventSourceFactory.produce(input_url=args.labfile, max_events=1))
         for event_r1 in tqdm(event_source(args.labfile, max_events=args.maxevents), total = args.maxevents):
             cal.calibrate(event_r1) # Not needed as it is already R1 data?
             print('\n\nCamera Event\n\n')
@@ -73,15 +72,14 @@ except FileNotFoundError:
     print('LAB file_not_found')
 
 ######### MC DATA p.e. ###########
-cal2 = CameraCalibrator()
-dl0 = CameraDL0Reducer()
-dl1 = CameraDL1Calibrator()
+
 try:
     if args.mcfile is not None:
+        cal2 = CameraCalibrator(eventsource=EventSourceFactory.produce(input_url=args.mcfile, max_events=1))
+
         for event_mc2 in tqdm(event_source(args.mcfile, max_events=args.maxevents), total=args.maxevents):
             cal2.calibrate(event_mc2)
-            dl0.reduce(event_mc2)
-            dl1.calibrate(event_mc2)
+
             print('\n\nMonte Carlo Event\n\n')
             for tel in event_mc2.r1.tels_with_data:
                 geom = event_mc2.inst.subarray.tel[tel].camera
