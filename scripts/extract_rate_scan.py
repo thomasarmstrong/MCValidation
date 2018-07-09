@@ -106,14 +106,10 @@ class TriggerEffiencyGenerator(Tool):
             self.trig_eff_array.append(n_trig/run_list[5][n])
             self.disc_array.append(run_list[7][n])
             # exit()
-        plt.plot(n_pe, trig_eff )
-        plt.show()
+
         if debug:
-            plt.xscale('log')
-            plt.yscale('log')
-            plt.plot([0,1000],[0,1000], 'k:')
-            plt.xlabel('Input p.e.')
-            plt.ylabel('True mc p.e.')
+            plt.plot(self.disc_array, self.trig_eff)
+            plt.show()
             plt.show()
 
     def finish(self):
