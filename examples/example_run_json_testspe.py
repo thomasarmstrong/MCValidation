@@ -450,7 +450,6 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " --camradius 30 "
           " --runSimTelarray "
           " --runLightEmission "
-          " --fixCorsika "
           " --nsb 0.0 "
           " --discthresh 0 "
           " --extra_opts \" "
