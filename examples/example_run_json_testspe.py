@@ -468,6 +468,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C FADC_SUM_OFFSET=15 "
           " -C FADC_Sum_Bins=96 "
           " -C FADC_BINS=128 "
+          " -C FADC_VAR_SENSITIVITY=0 "
           " -C discriminator_amplitude=1 "
           " -C TRIGGER_PIXELs=2 "
           " -C teltrig_min_sigsum=0 "
