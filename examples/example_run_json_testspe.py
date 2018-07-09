@@ -479,5 +479,6 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C discriminator_fall_time=0 "
           " -C discriminator_output_amplitude=1 "
           " -C discriminator_output_var_percent=0 "
+          " -C FLATFIELDING=0 "
           " -C discriminator_var_threshold=0.2 \"  "
           "--xdisp 0.0 --ydisp 0.0 --spec 398 ")
