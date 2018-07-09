@@ -444,12 +444,11 @@ import os
 # test fixed gain_var and qe_var
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_spe_spectrum/runlist.txt "
           " --outdir /home/armstrongt/Data/MCValidation/test_spe_spectrum/test_fixgain "
-          " --nevents 2 "
+          " --nevents File "
           " --angdist configs/ang_dist_mpik_flat_20deg.dat "
           " --distance 155.2 "
           " --camradius 30 "
           " --runSimTelarray "
-          " --runLightEmission "
           " --nsb 0.0 "
           " --discthresh 0 "
           " --extra_opts \" "
