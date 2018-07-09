@@ -65,7 +65,7 @@ def run_lightemission(events=3, photons=10946249, distance=100, cam_radius=30, x
               '-o %s' % (lightEmission_path, events, photons, distance, cam_radius, ang_dist, spectrum, xdisp, ydisp, out_file))
 
 
-def run_corsika_simtel(params):
+def run_corsika_simtel(args, infile, n, p):
     """
     function for running the helper function, separated out for multiprocessing reasons
     :param params: input command line options
@@ -73,7 +73,7 @@ def run_corsika_simtel(params):
     """
     #################### CORSIKA STEP ###################
 
-    args,infile,n,p = params
+    # args,infile,n,p = params
     if not args.fixCorsika:
         # Continue with normal loop, corsika file generated for each line in runlist
         infl = '%s/corsika/run%04d.corsika.gz' % (args.outdir, int(infile[0][n]))
