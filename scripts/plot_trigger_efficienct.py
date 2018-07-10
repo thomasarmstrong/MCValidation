@@ -10,7 +10,7 @@ parser.add_argument('--flashHz', default=10000, help='Freqency of laser pulses (
 parser.add_argument('--noiseMHz', default=0.005, help='Assumed Noise frequency')
 parser.add_argument('--fadcMHz', default=1000, help='FADC sampling frequency (MHz)')
 parser.add_argument('--fadcBins', default=96, help='number of readout bins')
-parser.add_argument('--pe2mv', default=2.33, help='conversion between p.e. and mV')
+parser.add_argument('--pe2mv', default=2.33, type=float, help='conversion between p.e. and mV')
 args = parser.parse_args()
 
 signal = np.loadtxt(args.lightFile, unpack=True)
