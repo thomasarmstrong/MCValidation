@@ -125,7 +125,6 @@ package.
 See code extract_pedistal.py
 
 
-![baseline rms](Figures/BaselineStartRMS.png) ![baseline rms](Figures/BaselineStartMean.png)
 
 <img src="Figures/BaselineStartRMS.png" width="400"> <img src="Figures/BaselineStartMean.png" width="400">
 
