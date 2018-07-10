@@ -28,16 +28,18 @@ total = signal_rate[0:len(noise[0])]+noise_rate
 total = np.append(total, signal_rate[len(noise[0]):])
 ax1.plot(args.pe2mv*signal[0], total, color='k', label='total rate')
 ax1.set_ylim([0,20000])
-ax1.set_xlim([0,50])
+
 
 ax1.set_xlabel('Discriminator Threshold [p.e.]')
 ax1.set_ylabel('Rate [Hz]')
 
-ax2 = ax1.twiny()
-ax2.set_xlim([0,50])
-ax2.set_xlabel('~Discriminator Threshold [mV]')
+
 
 if args.reference is not None:
+    ax1.set_xlim([0, 50])
+    ax2 = ax1.twiny()
+    ax2.set_xlim([0, 50])
+    ax2.set_xlabel('~Discriminator Threshold [mV]')
     lab = np.loadtxt(args.reference, unpack=True, delimiter=',')
     plt.plot(lab[0],lab[1], color='g', label='lab measurement')
     plt.plot(-10,-10, color='b', ls='--', label='laser pulse')
