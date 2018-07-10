@@ -124,6 +124,12 @@ package.
 
 See code extract_pedistal.py
 
+
+
+<img src="Figures/BaselineStartRMS.png" width="400"> <img src="Figures/BaselineStartMean.png" width="400">
+
+
+
 ## Basic Photo-Sensor Response
 
 > For normal incidence the PDE (photon detection efficiency) for SiPM at the bias voltage as used
