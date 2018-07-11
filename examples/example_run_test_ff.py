@@ -3,12 +3,13 @@ import os
 
 # - 40% opct, Expected Dark Count 5MHz, NSB value 0 GHz
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_ff/runlist.txt "
-          " --outdir /home/armstrongt/Data/MCValidation/test_ff "
-          " --nevents File "
-          " --angdist configs/ang_dist_mpik_flat_20deg.dat "
+          " --outdir /home/armstrongt/Data/MCValidation/test_ff2 "
+          " --nevents 10 "
+          " --angdist /home/armstrongt/Software/CTA/MCValidation/configs/ang_dist_spot.dat"
           " --distance 155.2 "
           " --camradius 30 "
           " --runSimTelarray "
+          " --runLightEmission"
           " --nsb 0.005 "
           " --discthresh 0 "
           " --extra_opts \" "
