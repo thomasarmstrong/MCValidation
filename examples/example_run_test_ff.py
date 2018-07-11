@@ -30,6 +30,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C FADC_VAR_SENSITIVITY=0 "
           " -C discriminator_amplitude=1 "
           " -C TRIGGER_PIXELs=2 "
+          " -C PIXELS_PARALLEL=1 "
           " -C teltrig_min_sigsum=0 "
           " -C discriminator_sigsum_over_threshold=0 "
           " -C discriminator_var_sigsum_over_threshold=0 "
