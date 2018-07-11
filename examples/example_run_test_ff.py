@@ -87,7 +87,7 @@ import os
 #           "--xdisp 0.0 --ydisp 0.0 --spec 398 ")
 #
 
-- 40% opct, Expected Dark Count 5MHz, NSB value 0 GHz
+# - 40% opct, Expected Dark Count 5MHz, NSB value 0 GHz
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_ff/runlist.txt "
           " --outdir /home/armstrongt/Data/MCValidation/test_ff "
           " --nevents 10 "
