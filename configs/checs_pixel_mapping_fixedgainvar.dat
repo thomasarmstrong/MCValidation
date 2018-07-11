@@ -21,7 +21,7 @@
 # Note that pixel size is scale from the actual 6.125 mm at the focal length
 # planned with GATE telescopes (228.3 cm) to the focal length of ASTRI (215 cm).
 # Similarly scaled are the pixel positions.
-PixType    1 0 2 0.623   2 0.623 0.0   "transmission_pmma_vs_theta_20150422.dat" "transmission_pmma_vs_lambda_meas0deg_coat_82raws.dat"
+PixType    1 0 2 0.623   2 0.623 0.0   1.0 1.0
 
 # Pixel format:
 # Par.  1: pixel number (starting at 0)
