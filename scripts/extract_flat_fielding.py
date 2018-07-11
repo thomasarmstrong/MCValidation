@@ -15,7 +15,7 @@ from scipy import interpolate
 from scipy.ndimage import correlate1d
 from ctapipe.image.charge_extractors import GlobalPeakIntegrator, LocalPeakIntegrator, NeighbourPeakIntegrator, AverageWfPeakIntegrator, ChargeExtractorFactory
 from CHECLabPy.core.base_reducer import WaveformReducer
-
+import random
 
 def load_reference_pulse(path):
     file = np.loadtxt(path, delimiter=',')
@@ -156,6 +156,7 @@ class FlatFieldGenerator(Tool):
         self.neighbour = None
         self.reconstructed_image_array =[]
         self.mean_reconstructed_image_array = None
+        self.mean_true_image_array = None
         self.event_count=0
         self.geom = None
         self.disp = None
@@ -172,6 +173,8 @@ class FlatFieldGenerator(Tool):
         self.aver = AverageWfPeakIntegrator()
 
     def start(self):
+        fig1 = plt.figure(3)
+        ax1 = fig1.add_subplot(111, aspect = 'equal')
         try:
             source = EventSourceFactory.produce(input_url=self.infile, max_events=self.max_events)
 
@@ -183,23 +186,42 @@ class FlatFieldGenerator(Tool):
                 if self.disp is None:
                     self.geom = event.inst.subarray.tel[self.telescopes].camera
                     self.mean_reconstructed_image_array = np.zeros(len(self.geom.pix_id))
-                    if self.debug:
-                        self.disp = CameraDisplay(self.geom)
-                        self.disp.add_colorbar()
+                    self.mean_true_image_array = np.zeros(len(self.geom.pix_id))
+                    self.disp = 1
+                    # if self.debug:
+                        # self.disp = CameraDisplay(self.geom)
+                        # self.disp.add_colorbar()
 
                 # reco_array = self.cross.get_charge(event.r1.tel[self.telescopes].waveform[0])['charge']
                 # reco_array = self.glob_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0]
-                reco_array =  self.local_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0]
+                reco_array =  self.local_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0] #/ np.mean(self.local_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0])
+                true_array = event.mc.tel[self.telescopes].photo_electron_image #/ np.mean(event.mc.tel[self.telescopes].photo_electron_image)
+                print(true_array)
+                print(reco_array)
+                exit()
+                # plt.scatter(event.mc.tel[self.telescopes].photo_electron_image,reco_array)
+                # plt.show()
+                #
+                # exit()
                 # reco_array = self.aver.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0]
                 # reco_array = self.neighbour.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0]
                 # print(reco_array)
                 # exit()
                 # print(event.mc.tel[self.telescopes].photo_electron_image)
 
-                self.mean_reconstructed_image_array = np.add(self.mean_reconstructed_image_array,
-                                                             # event.mc.tel[self.telescopes].photo_electron_image)
-                                                             reco_array)
-                self.reconstructed_image_array.append(event.dl1.tel[self.telescopes].image[0])
+                self.mean_true_image_array = np.add(self.mean_true_image_array, true_array)
+                self.mean_reconstructed_image_array = np.add(self.mean_reconstructed_image_array, reco_array)
+                print(self.mean_true_image_array)
+                print(self.mean_reconstructed_image_array)
+                dist = np.sqrt(self.geom.pix_x.value**2 + self.geom.pix_y.value**2)
+                plt.scatter( self.mean_true_image_array/np.mean(self.mean_true_image_array), self.mean_reconstructed_image_array/np.mean(self.mean_reconstructed_image_array), c = dist, alpha=0.4)
+                # ax1.set_ylim(0,2)
+                # ax1.set_xlim(0,2)
+                plt.draw()
+                plt.pause(0.4)
+                plt.cla()
+
+                # self.reconstructed_image_array.append(event.dl1.tel[self.telescopes].image[0])
                 self.event_count += 1
         except FileNotFoundError:
             print('file_not_found')
@@ -211,12 +233,21 @@ class FlatFieldGenerator(Tool):
         #     out_file.write('%s\t%s\n' % (self.geom.pix_id, self.reconstructed_image_array))
         # out_file.close()
         self.mean_reconstructed_image_array = self.mean_reconstructed_image_array/self.event_count
+        self.mean_true_image_array = self.mean_true_image_array/self.event_count
         if self.debug:
             # mean_image = np.mean(self.reconstructed_image_array,axis=0)/np.mean(np.mean(self.reconstructed_image_array))
             mean_image = self.mean_reconstructed_image_array
-            self.disp.image = mean_image
-            # self.disp.norm = 'log'
+            self.disp.image = self.mean_true_image_array
 
+
+            fig = plt.figure(3)
+            plt.hist(self.mean_true_image_array/self.mean_true_image_array.mean(), alpha = 0.5, label='true')
+            plt.hist( self.mean_reconstructed_image_array/self.mean_reconstructed_image_array.mean(), alpha = 0.5, label='reco')
+            plt.legend()
+            # from IPython import embed
+            # embed()
+            # self.disp.norm = 'log'
+            # self.disp.set_limits_minmax(40.5,44.5)
             plt.show()
 
 def main():
