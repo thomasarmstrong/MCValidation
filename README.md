@@ -55,7 +55,14 @@ python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 -
 --distance 100 --camradius 30 --runSimTelarray --nsb 0 --discthresh 0
 ```
 
-Note you need to add export CORSIKASIMTEL='path to your corsika simtel verison" in your bashrc
+Note you need to add
+
+```
+export CORSIKASIMTEL="path to your corsika simtel verison"
+export MCVAL="path to your MCValidation folder"
+```
+
+in your bashrc
 
 
 Note: for a lot of test measurements, it should be possible to set the transmission and pde to 100% which should just result in fewer photons being simulated
