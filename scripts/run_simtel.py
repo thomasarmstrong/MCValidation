@@ -4,9 +4,9 @@ import numpy as np
 import multiprocessing
 
 ## Hardcoded parameters:
-simtel_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-06-12_testing/sim_telarray'
-corsika_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-06-12_testing/corsika-6990/run'
-lightEmission_path = '/scratch/armstrongt/Workspace/CTA/MCValidation/src/LightEmission-pkg'
+simtel_path = '$CORSIKASIMTEL/sim_telarray'
+corsika_path = '$CORSIKASIMTEL/corsika-6990/run'
+lightEmission_path = '$CORSIKASIMTEL/sim_telarray/LightEmission'
 
 
 

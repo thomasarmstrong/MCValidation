@@ -55,6 +55,9 @@ python run_simtel.py --infile runlist.txt --outdir ~/Data/test_run --nevents 1 -
 --distance 100 --camradius 30 --runSimTelarray --nsb 0 --discthresh 0
 ```
 
+Note you need to add export CORSIKASIMTEL='path to your corsika simtel verison" in your bashrc
+
+
 Note: for a lot of test measurements, it should be possible to set the transmission and pde to 100% which should just result in fewer photons being simulated
 (i.e. save some cpu and storage space)
 
@@ -269,3 +272,8 @@ Rate scan?
 ## Generating SPE input
 
 For CHEC-S we measured the SPE in the lab, fit using a Gentile Fitter to obtain the relevant parameters. TODO
+
+## angular distribution
+
+Inital tests still had the angular and wavelength distribution files in the camera configuration file. This led to
+a large amount of non-unformity accross the camera.
