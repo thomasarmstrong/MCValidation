@@ -90,13 +90,13 @@ import os
 
 # prod 3
 os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/test_ff/runlist.txt "
-          " --outdir /home/armstrongt/Data/MCValidation/test_ff "
-          " --nevents 10 "
+          " --outdir /home/armstrongt/Data/MCValidation/prod_3 "
+          " --nevents 1000 "
           " --angdist /home/armstrongt/Software/CTA/MCValidation/configs/ang_dist_spot.dat"
           " --distance 155.2 "
           " --camradius 30 "
           " --runSimTelarray "
-          # " --runLightEmission"
+          " --runLightEmission"
           " --nsb 0.00 "
           " --discthresh 0 "
           "--xdisp 0.0 --ydisp 0.0 --spec 398 ")

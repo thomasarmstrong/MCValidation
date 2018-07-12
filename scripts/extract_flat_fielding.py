@@ -188,17 +188,17 @@ class FlatFieldGenerator(Tool):
                     self.mean_reconstructed_image_array = np.zeros(len(self.geom.pix_id))
                     self.mean_true_image_array = np.zeros(len(self.geom.pix_id))
                     self.disp = 1
-                    # if self.debug:
-                        # self.disp = CameraDisplay(self.geom)
-                        # self.disp.add_colorbar()
+                    if self.debug:
+                        self.disp = CameraDisplay(self.geom)
+                        self.disp.add_colorbar()
 
                 # reco_array = self.cross.get_charge(event.r1.tel[self.telescopes].waveform[0])['charge']
                 # reco_array = self.glob_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0]
                 reco_array =  self.local_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0] #/ np.mean(self.local_peak.extract_charge(event.r1.tel[self.telescopes].waveform)[0][0])
                 true_array = event.mc.tel[self.telescopes].photo_electron_image #/ np.mean(event.mc.tel[self.telescopes].photo_electron_image)
-                print(true_array)
-                print(reco_array)
-                exit()
+                # print(true_array)
+                # print(reco_array)
+                # exit()
                 # plt.scatter(event.mc.tel[self.telescopes].photo_electron_image,reco_array)
                 # plt.show()
                 #
@@ -211,15 +211,15 @@ class FlatFieldGenerator(Tool):
 
                 self.mean_true_image_array = np.add(self.mean_true_image_array, true_array)
                 self.mean_reconstructed_image_array = np.add(self.mean_reconstructed_image_array, reco_array)
-                print(self.mean_true_image_array)
-                print(self.mean_reconstructed_image_array)
-                dist = np.sqrt(self.geom.pix_x.value**2 + self.geom.pix_y.value**2)
-                plt.scatter( self.mean_true_image_array/np.mean(self.mean_true_image_array), self.mean_reconstructed_image_array/np.mean(self.mean_reconstructed_image_array), c = dist, alpha=0.4)
+                # print(self.mean_true_image_array)
+                # print(self.mean_reconstructed_image_array)
+                # dist = np.sqrt(self.geom.pix_x.value**2 + self.geom.pix_y.value**2)
+                # plt.scatter( self.mean_true_image_array/np.mean(self.mean_true_image_array), self.mean_reconstructed_image_array/np.mean(self.mean_reconstructed_image_array), c = dist, alpha=0.4)
                 # ax1.set_ylim(0,2)
                 # ax1.set_xlim(0,2)
-                plt.draw()
-                plt.pause(0.4)
-                plt.cla()
+                # plt.draw()
+                # plt.pause(0.4)
+                # plt.cla()
 
                 # self.reconstructed_image_array.append(event.dl1.tel[self.telescopes].image[0])
                 self.event_count += 1
@@ -237,13 +237,13 @@ class FlatFieldGenerator(Tool):
         if self.debug:
             # mean_image = np.mean(self.reconstructed_image_array,axis=0)/np.mean(np.mean(self.reconstructed_image_array))
             mean_image = self.mean_reconstructed_image_array
-            self.disp.image = self.mean_true_image_array
+            self.disp.image = self.mean_reconstructed_image_array
 
 
-            fig = plt.figure(3)
-            plt.hist(self.mean_true_image_array/self.mean_true_image_array.mean(), alpha = 0.5, label='true')
-            plt.hist( self.mean_reconstructed_image_array/self.mean_reconstructed_image_array.mean(), alpha = 0.5, label='reco')
-            plt.legend()
+            # fig = plt.figure(3)
+            # plt.hist(self.mean_true_image_array/self.mean_true_image_array.mean(), alpha = 0.5, label='true')
+            # plt.hist( self.mean_reconstructed_image_array/self.mean_reconstructed_image_array.mean(), alpha = 0.5, label='reco')
+            # plt.legend()
             # from IPython import embed
             # embed()
             # self.disp.norm = 'log'
