@@ -373,6 +373,7 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C discriminator_output_amplitude=1 "
           " -C discriminator_output_var_percent=0 "
           " -C FLATFIELDING=0 "
+          " -C TRIGGER CURRENT LIMIT=1000000 "
           " -C discriminator_var_threshold=0.2 \"  "
           "--xdisp 0.0 --ydisp 0.0 --spec 398 ")
 
@@ -544,5 +545,6 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " -C discriminator_output_amplitude=1 "
           " -C discriminator_output_var_percent=0 "
           " -C FLATFIELDING=0 "
+          " -C TRIGGER CURRENT LIMIT=1000000 "
           " -C discriminator_var_threshold=0.2 \"  "
           "--xdisp 0.0 --ydisp 0.0 --spec 398 ")
