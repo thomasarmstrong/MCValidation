@@ -42,7 +42,7 @@ import os
 #           "--xdisp 0.0 --ydisp 0.0 --spec 398 ")
 
 
-os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/runlist.txt "
+os.system("python $MCVAL/scripts/run_simtel.py --infile /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/runlist.txt "
           " --outdir /home/armstrongt/Data/MCValidation/d2018-05-02_NSBsweep_with-laser_gainmatched-100mV/simtel/secondRun "
           " --nevents File "
           " --angdist ../configs/ang_dist_mpik_flat_20deg.dat "
@@ -55,11 +55,11 @@ os.system("python /home/armstrongt/Software/CTA/MCValidation/scripts/run_simtel.
           " --nsb File "
           " --discthresh 0 "
           " --extra_opts \" "
-          " -C CAMERA_CONFIG_FILE=/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/02_cameraConfigFile/checs_pixel_mapping_v2.dat "
-          " -C quantum_efficiency=/scratch/armstrongt/Workspace/CTA/MCValidation/data/config/camera/10_quantumEfficiency/S10362-11-050U-3V-format.dat "
-          " -C discriminator_pulse_shape=/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/15_pulseShape/disc_shape_CHEC-S_27042018.dat "
-          " -C fadc_pulse_shape=/home/armstrongt/Workspace/CTA/MCValidation/data/config/camera/15_pulseShape/pulse_CHEC-S_FADC_27042018.dat "
-          " -C pm_photoelectron_spectrum=/scratch/armstrongt/Workspace/CTA/MCValidation/data/config/camera/04_SPE/checs_spe_spectrum_v2_normalised.txt "
+          " -C CAMERA_CONFIG_FILE=$MCVAL/configs/camera/02_cameraConfigFile/checs_pixel_mapping_v2.dat "
+          " -C quantum_efficiency=$MCVAL/configs/camera/10_quantumEfficiency/S10362-11-050U-3V-format.dat "
+          " -C discriminator_pulse_shape=$MCVAL/configs/camera/15_pulseShape/disc_shape_CHEC-S_27042018.dat "
+          " -C fadc_pulse_shape=$MCVAL/configs/camera/15_pulseShape/pulse_CHEC-S_FADC_27042018.dat "
+          " -C pm_photoelectron_spectrum=$MCVAL/configs/camera/04_SPE/checs_spe_spectrum_v2_normalised.txt "
           " -C pm_voltage_variation=0 "
           " -C gain_variation=0.074 "
           " -C QE_variation=0.09 "

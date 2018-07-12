@@ -237,7 +237,7 @@ class FlatFieldGenerator(Tool):
         if self.debug:
             # mean_image = np.mean(self.reconstructed_image_array,axis=0)/np.mean(np.mean(self.reconstructed_image_array))
             mean_image = self.mean_reconstructed_image_array
-            self.disp.image = self.mean_reconstructed_image_array
+            self.disp.image = self.mean_true_image_array
 
 
             # fig = plt.figure(3)
