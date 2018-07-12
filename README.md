@@ -276,11 +276,23 @@ Rate scan?
 
 # Lessons Learned
 
-## Generating SPE input
+### Generating SPE input
 
-For CHEC-S we measured the SPE in the lab, fit using a Gentile Fitter to obtain the relevant parameters. TODO
+For CHEC-S we measured the SPE in the lab, fit using a Gentile Fitter to obtain the relevant parameters.
+Need to be very careful with the normalisation using norm_spe. our initial attemp of a spe curve with
+40% optical cross talk produced resuts with 60%...
 
-## angular distribution
+### Non uniformity in reco vs true p.e.?
 
-Inital tests still had the angular and wavelength distribution files in the camera configuration file. This led to
-a large amount of non-unformity accross the camera.
+still don't understand this one fully, is the reco flat fielded in sim_tel?
+
+### Flatfielding
+
+Needed to add hardcoded gain and qe variations to the camera configuration file as opposed to through the
+main parameters (which will be set to 0). If this is not done, then calibration derived from one run
+will not be applicable to any other, as the pixel values will change.
+
+### High NSB
+
+Need to make sure trigger_current_limit is set high enough
+
