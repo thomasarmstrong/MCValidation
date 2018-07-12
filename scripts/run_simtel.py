@@ -4,9 +4,9 @@ import numpy as np
 import multiprocessing
 
 ## Hardcoded parameters:
-simtel_path = '$CORSIKASIMTEL/sim_telarray'
-corsika_path = '$CORSIKASIMTEL/corsika-6990/run'
-lightEmission_path = '$CORSIKASIMTEL/sim_telarray/LightEmission'
+simtel_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-06-12_testing/sim_telarray'
+corsika_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-06-12_testing/corsika-6990/run'
+lightEmission_path = '/scratch/armstrongt/Workspace/CTA/MCValidation/src/LightEmission-pkg'
 
 
 
@@ -226,7 +226,7 @@ def main():
 
         if args.cores is None:
             for n, p in enumerate(infile[3]):
-                run_corsika_simtel([args, infile, n, p])
+                run_corsika_simtel([args, infile, n, p)
         else:
             tasks = []
             pool = multiprocessing.Pool(int(args.cores))
