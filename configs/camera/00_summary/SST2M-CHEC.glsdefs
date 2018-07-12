@@ -1,0 +1,30 @@
+\ifglsentryexists{MAPM}{}%
+{%
+\gls@defglossaryentry{MAPM}%
+{%
+name={MAPM},%
+sort={MAPM},%
+type={main},%
+first={MAPM},%
+firstplural={MAPMs},%
+text={MAPM},%
+plural={MAPMs},%
+description={Multi-Anode Photomultiplier},%
+descriptionplural={Multi-Anode Photomultiplier},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={},%
+longplural={},%
+short={},%
+shortplural={},%
+counter={page},%
+parent={},%
+%
+}%
+}%

@@ -1,0 +1,44 @@
+\contentsline {chapter}{Table of Contents}{2}{table.0.1}
+\contentsline {chapter}{\numberline {1}Camera}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Camera Pixels}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Camera Config File }{3}{section.1.2}
+\contentsline {section}{\numberline {1.3}NSB}{6}{section.1.3}
+\contentsline {section}{\numberline {1.4}SPE}{6}{section.1.4}
+\contentsline {section}{\numberline {1.5}Gain Variation }{7}{section.1.5}
+\contentsline {section}{\numberline {1.6}PM Voltage Variation}{7}{section.1.6}
+\contentsline {section}{\numberline {1.7}PM Transit Time}{8}{section.1.7}
+\contentsline {section}{\numberline {1.8}PM Transit Time Jitter}{8}{section.1.8}
+\contentsline {section}{\numberline {1.9}Photon Delay}{8}{section.1.9}
+\contentsline {section}{\numberline {1.10}QE}{8}{section.1.10}
+\contentsline {section}{\numberline {1.11}QE Variations}{9}{section.1.11}
+\contentsline {section}{\numberline {1.12}Disc Bins }{10}{section.1.12}
+\contentsline {section}{\numberline {1.13}Disc Start}{10}{section.1.13}
+\contentsline {section}{\numberline {1.14}Default Trigger}{10}{section.1.14}
+\contentsline {section}{\numberline {1.15}Pulse Shape}{10}{section.1.15}
+\contentsline {section}{\numberline {1.16}Discriminator Amplitude}{11}{section.1.16}
+\contentsline {section}{\numberline {1.17}Trigger Pixels }{12}{section.1.17}
+\contentsline {section}{\numberline {1.18}Teltrig Min Time}{12}{section.1.18}
+\contentsline {section}{\numberline {1.19}Teltrig Min Sigsum}{12}{section.1.19}
+\contentsline {section}{\numberline {1.20}Discriminator Sigsum Over Thresh }{12}{section.1.20}
+\contentsline {section}{\numberline {1.21}Discriminator Var Sigsum over Thresh}{13}{section.1.21}
+\contentsline {section}{\numberline {1.22}Discriminator Gate Length}{13}{section.1.22}
+\contentsline {section}{\numberline {1.23}Discriminator Var Gate Length}{13}{section.1.23}
+\contentsline {section}{\numberline {1.24}Discriminator Rise Time}{13}{section.1.24}
+\contentsline {section}{\numberline {1.25}Discriminator Var Threshold}{14}{section.1.25}
+\contentsline {section}{\numberline {1.26}Discriminator Hysteresis}{14}{section.1.26}
+\contentsline {section}{\numberline {1.27}Discriminator Fall Time}{14}{section.1.27}
+\contentsline {section}{\numberline {1.28}Discriminator Time Over Thresh}{14}{section.1.28}
+\contentsline {section}{\numberline {1.29}Disc Var Time Over Threshold}{15}{section.1.29}
+\contentsline {section}{\numberline {1.30}Discriminator Output Amplitude}{15}{section.1.30}
+\contentsline {section}{\numberline {1.31}Discriminator Output Var Percent}{15}{section.1.31}
+\contentsline {section}{\numberline {1.32}FADC MHz}{15}{section.1.32}
+\contentsline {section}{\numberline {1.33}FADC Bins }{16}{section.1.33}
+\contentsline {section}{\numberline {1.34}FADC Sum Bins }{16}{section.1.34}
+\contentsline {section}{\numberline {1.35}FADC Sum Offset }{16}{section.1.35}
+\contentsline {section}{\numberline {1.36}36. FADC Pedestal }{16}{section.1.36}
+\contentsline {section}{\numberline {1.37}FADC Amplitude }{17}{section.1.37}
+\contentsline {section}{\numberline {1.38}FADC Noise }{17}{section.1.38}
+\contentsline {section}{\numberline {1.39}FADC Max Signal }{18}{section.1.39}
+\contentsline {section}{\numberline {1.40}FADC Pedestal Variation}{18}{section.1.40}
+\contentsline {section}{\numberline {1.41}Camera Filter}{19}{section.1.41}
+\contentsline {chapter}{References}{19}{figure.caption.13}
