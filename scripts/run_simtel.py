@@ -226,7 +226,7 @@ def main():
 
         if args.cores is None:
             for n, p in enumerate(infile[3]):
-                run_corsika_simtel([args, infile, n, p)
+                run_corsika_simtel([args, infile, n, p])
         else:
             tasks = []
             pool = multiprocessing.Pool(int(args.cores))
