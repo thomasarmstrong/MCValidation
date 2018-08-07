@@ -16,6 +16,7 @@ from ctapipe.calib import CameraCalibrator, CameraDL1Calibrator
 from ctapipe.analysis.camera.chargeresolution import ChargeResolutionCalculator
 from scipy.interpolate import interp1d
 import argparse
+import astropy.units as u
 
 
 PIXEL_EPSILON = 0.0002
@@ -90,7 +91,13 @@ class Geometry:
         self.npix = len(self.geom.pix_id)
         self.total_scale = np.ones(self.npix)
         self.pixel_mask = np.ones(self.npix)
-        # self.pixel_pos = np.load("/Users/armstrongt/Software/CTA/CHECsoft/CHECAnalysis/targetpipe/targetpipe/io/checm_pixel_pos.npy")
+        # pixfile = np.loadtxt("/Users/armstrongt/Workspace/CTA/MCValidation/src/MCValidation/configs/checs_pixel_mapping_fixedgainvar_justpix.dat", unpack=True)
+        # self.geom.pix_x = pixfile[2]/100*u.m
+        # self.geom.pix_y = pixfile[3]/100*u.m
+        # self.geom.pix_id = pixfile[0]
+        # self.geom.pix_size = 0.623/100*u.m
+        # print(self.geom)
+
         self.pix_size = np.sqrt(self.geom.pix_area[0]).value
         self.fiducial_center = self.camera_curve_center_x + self.camera_curve_radius * np.cos(np.pi) # This is a little confusing, is it going to be set up to change the position of the lightsource
         self.ang_dist_file = np.loadtxt(self.ang_dist_file_string, unpack=True)
@@ -310,7 +317,7 @@ class Geometry:
         self.plot_values3d()
 
     def plot2dscales(self, verts, area2, scale2):
-        fig = plt.figure()
+        fig = plt.figure(10)
         ax1 = fig.add_subplot(221)
         ax2 = fig.add_subplot(222)
         ax3 = fig.add_subplot(223)
@@ -361,6 +368,13 @@ class Geometry:
         fig.colorbar(poly2d2, ax=ax2)
         fig.colorbar(poly2d3, ax=ax3)
         fig.colorbar(poly2d4, ax=ax4)
+
+        fig20 = plt.figure(20)
+        ax20 = fig20.add_subplot(111)
+        dist = np.sqrt(self.geom.pix_x**2+ self.geom.pix_y**2)
+        plt.scatter(dist, self.required_pe * np.array(self.total_scale)/max(self.total_scale))
+        ax20.set_xlabel('distance')
+        ax20.set_ylabel('number of p.e.')
 
     def getscale(self, plot=False):
 
@@ -446,16 +460,29 @@ def main():
     # pe = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 35, 37, 40, 43, 46, 49, 53, 57, 61, 65, 70, 75, 81, 86, 93, 100, 107, 114, 123, 132, 141, 151, 162, 174, 187, 200, 215, 231, 247, 265, 284, 305, 327, 351, 376, 403, 432, 464, 497, 533, 572, 613, 657, 705, 756, 811, 869, 932, 1000]
     # pe = [   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   12, 14,   16,   19,   22,   25,   29,   33,   39,   44,   51,   59, 68,   79,   91,  104,  120,  138,  159,  184,  212,  244,  281, 323,  372,  429,  494,  568,  655,  754,  868, 1000]
 
-    for n,i in enumerate(pe):
+    try:
+        for n,i in enumerate(pe):
+            # g.required_pe = i
+            photons = g.set_illumination(i, tote_trans)
+            # print(i, ' ', photons)
+            ph.append(round(photons,2))
+            pe2.append(round(i,2))
+            # run.append(int(fl[0][n]))
+            # g.getscale(plot=False)
+            if args.outfile != None:
+                out.write('%s\t%s\t%s\t%s\t%s\t%s\n' % (int(fl[0][n]),int(fl[1][n]),fl[2][n],fl[3][n],round(photons,2),int(fl[4][n])))
+    except TypeError:
         # g.required_pe = i
-        photons = g.set_illumination(i, tote_trans)
+        photons = g.set_illumination(pe, tote_trans)
         # print(i, ' ', photons)
-        ph.append(round(photons,2))
-        pe2.append(round(i,2))
+        ph.append(round(photons, 2))
+        pe2.append(round(pe, 2))
         # run.append(int(fl[0][n]))
         # g.getscale(plot=False)
         if args.outfile != None:
-            out.write('%s\t%s\t%s\t%s\t%s\t%s\n' % (int(fl[0][n]),int(fl[1][n]),fl[2][n],fl[3][n],round(photons,2),int(fl[4][n])))
+            out.write('%s\t%s\t%s\t%s\t%s\t%s\n' % (
+            int(fl[0][n]), int(fl[1][n]), fl[2][n], fl[3][n], round(photons, 2), int(fl[4][n])))
+
     print('number of requested photoelectrons')
     print(pe2)
     print('number of required emitted photons')
@@ -463,7 +490,8 @@ def main():
     print('Run number')
     print(run)
 
-
+    g.getscale(plot=True)
+    plt.show()
 
 if __name__ == '__main__':
     main()
