@@ -34,6 +34,8 @@ class TriggerEffiencyGenerator(Tool):
 
     run_list_file = Unicode('None',help='Path to runlist used for simulation').tag(config=True)
 
+    pixel_patch = List([-1.,-1], help='List of pixels used').tag(config=True)
+
 
     aliases = Dict(dict(input_path='TriggerEffiencyGenerator.input_path',
                         output_name='TriggerEffiencyGenerator.output_name',
@@ -43,7 +45,8 @@ class TriggerEffiencyGenerator(Tool):
                         T='TriggerEffiencyGenerator.telescopes',
                         plot_cam='TriggerEffiencyGenerator.plot_cam',
                         use_true_pe='TriggerEffiencyGenerator.use_true_pe',
-                        run_list_file='TriggerEffiencyGenerator.run_list_file'
+                        run_list_file='TriggerEffiencyGenerator.run_list_file',
+                        pixel_patch='TriggerEfficiencyGenerator.pixel_patch'
                         ))
     classes = List([EventSourceFactory,
                     CameraDL1Calibrator,
@@ -106,9 +109,13 @@ class TriggerEffiencyGenerator(Tool):
                 source = EventSourceFactory.produce(input_url=file_name, max_events=self.max_events)
                 for event in tqdm(source):
                     im_temp=[]
-                    print('\n\n!!!Warning This is hardcoded for a pixel mask!!!\n\n')
-                    for ipix in [1385,1386,1337,1338,1339,1290,1291,1292,1243,1244]:
-                        im_temp.append(event.mc.tel[self.telescopes].photo_electron_image[ipix])
+                    # print('\n\n!!!Warning This is hardcoded for a pixel mask!!!\n\n')
+                    if self.pixel_patch[0]==-1:
+                        for ipix in range(len(event.mc.tel[self.telescopes].photo_electron_image)):
+                            im_temp.append(event.mc.tel[self.telescopes].photo_electron_image[ipix])
+                    else:
+                        for ipix in self.pixel_patch:
+                            im_temp.append(event.mc.tel[self.telescopes].photo_electron_image[ipix])
                     image_size.append(sum(im_temp))
                     n_trig = n_trig + 1
 
