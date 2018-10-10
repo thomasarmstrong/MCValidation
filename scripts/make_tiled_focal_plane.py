@@ -1,13 +1,14 @@
-"""Author: Jason Watson - Edited by Thomas Armstrong"""
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-from matplotlib import pyplot as plt
 from matplotlib import patches
 import numpy as np
 from ctapipe.instrument import CameraGeometry
 from ctapipe.visualization import CameraDisplay
 from matplotlib.collections import PolyCollection
 from matplotlib.patches import Rectangle
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection, pathpatch_2d_to_3d
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import math as m
 from ctapipe.io.hessio import hessio_event_source
 from ctapipe.image import tailcuts_clean
@@ -17,6 +18,15 @@ from ctapipe.analysis.camera.chargeresolution import ChargeResolutionCalculator
 from scipy.interpolate import interp1d
 import argparse
 import astropy.units as u
+from mpl_toolkits.mplot3d import axes3d
+from matplotlib.patches import Circle, PathPatch, Rectangle
+import matplotlib.pyplot as plt
+from matplotlib.transforms import Affine2D
+from mpl_toolkits.mplot3d import art3d
+import numpy as np
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+
 
 
 PIXEL_EPSILON = 0.0002
@@ -216,24 +226,31 @@ class Geometry:
         else: index = index -1
         return self.ang_dist_file[1][index]
 
-    def get_2dverts(self, xc, yc):
+    def get_2dverts(self, xc, yc, eps=PIXEL_EPSILON, s= None):
+        if s == None:
+            s = self.pix_size
         verts = []
-        verts.append((xc - self.pix_size / 2 -  PIXEL_EPSILON, yc - self.pix_size / 2 - PIXEL_EPSILON))
-        verts.append((xc + self.pix_size / 2 + PIXEL_EPSILON, yc - self.pix_size / 2 - PIXEL_EPSILON))
-        verts.append((xc + self.pix_size / 2 + PIXEL_EPSILON, yc + self.pix_size / 2 + PIXEL_EPSILON))
-        verts.append((xc - self.pix_size / 2 - PIXEL_EPSILON, yc + self.pix_size / 2 + PIXEL_EPSILON))
+        verts.append((xc - s / 2 -  eps, yc - s / 2 - eps))
+        verts.append((xc + s / 2 + eps, yc - s / 2 - eps))
+        verts.append((xc + s / 2 + eps, yc + s / 2 + eps))
+        verts.append((xc - s / 2 - eps, yc + s / 2 + eps))
         return verts
 
-    def get_3dverts(self, xc, yc):
+    def get_3dverts(self, xc, yc, zc=None, s=None):
         verts = []
-        verts.append((focal_plane(np.sqrt((xc - self.pix_size / 2) ** 2 + (yc - self.pix_size / 2) ** 2)),
-                       xc - self.pix_size / 2, yc - self.pix_size / 2))
-        verts.append((focal_plane(np.sqrt((xc + self.pix_size / 2) ** 2 + (yc - self.pix_size / 2) ** 2)),
-                       xc + self.pix_size / 2, yc - self.pix_size / 2))
-        verts.append((focal_plane(np.sqrt((xc + self.pix_size / 2) ** 2 + (yc + self.pix_size / 2) ** 2)),
-                       xc + self.pix_size / 2, yc + self.pix_size / 2))
-        verts.append((focal_plane(np.sqrt((xc - self.pix_size / 2) ** 2 + (yc + self.pix_size / 2) ** 2)),
-                       xc - self.pix_size / 2, yc + self.pix_size / 2))
+
+        if s == None:
+            s = self.pix_size
+        if zc == None:
+            verts.append((xc - s / 2, yc - s / 2,focal_plane(np.sqrt((xc) ** 2 + (yc) ** 2))))
+            verts.append((xc + s / 2, yc - s / 2, focal_plane(np.sqrt((xc) ** 2 + (yc) ** 2))))
+            verts.append((xc + s / 2, yc + s / 2, focal_plane(np.sqrt((xc) ** 2 + (yc) ** 2))))
+            verts.append((xc - s / 2, yc + s / 2, focal_plane(np.sqrt((xc) ** 2 + (yc) ** 2))))
+        else:
+            verts.append((xc - s/ 2, yc - s / 2,zc))
+            verts.append((xc + s / 2, yc - s / 2,zc))
+            verts.append((xc + s / 2, yc + s / 2,zc))
+            verts.append((xc - s / 2, yc + s / 2,zc))
         return verts
 
     def get_pixel_scaledarea(self, xc, yc):
@@ -260,11 +277,30 @@ class Geometry:
         fig = plt.figure()
         ax1 = fig.add_subplot(111,projection='3d')
         poly3d = Poly3DCollection(verts)
+
+        for i in range(2048):
+            x=self.geom.pix_x[i].value
+            y=self.geom.pix_y[i].value
+            if x >0.1 and y >0:
+        #
+                z=focal_plane(np.sqrt((x) ** 2 + (y) ** 2))
+        #
+        #         verts.append((x - g.pix_size / 2, y - g.pix_size / 2, z))
+        #         verts.append((x + g.pix_size / 2, y - g.pix_size / 2, z))
+        #         verts.append((x + g.pix_size / 2, y + g.pix_size / 2, z))
+        #         verts.append((x - g.pix_size / 2, y + g.pix_size / 2, z))
+        #
+        #         plt.scatter(x,y,z, color='k', marker=',')
+                ax1.quiver(z, x, y , 1, 0, 0, length=0.01)
+
         if not scale:
             poly3d.set_array(np.array(self.total_scale)/max(self.total_scale))
         else:
             poly3d.set_array(np.array(scale) / max(scale))
         ax1.add_collection3d(poly3d)
+
+
+
 
         theta = np.linspace(0, 2 * np.pi, 90)
         r = -np.arange(0, self.fiducial_radius, 0.01)
@@ -276,13 +312,14 @@ class Geometry:
         x = self.fiducial_radius* np.cos(u) * np.sin(v)
         y = self.fiducial_radius*np.sin(u) * np.sin(v)
         z = self.fiducial_radius* np.cos(v)
-        ax1.plot_wireframe(self.lightsource_distance+Z*(self.lightsource_distance/0.2),X+ self.lightsource_x,  Y+ self.lightsource_y, alpha = 0.1, color='C0')
-        ax1.plot_wireframe(x, y, z, color="C0", alpha = 0.1)
+        # ax1.plot_wireframe(self.lightsource_distance+Z*(self.lightsource_distance/0.2),X+ self.lightsource_x,  Y+ self.lightsource_y, alpha = 0.1, color='C0')
+        # ax1.plot_wireframe(x, y, z, color="C0", alpha = 0.1)
 
         lim = max(self.geom.pix_x).value
 
-        ax1.set_ylim3d(-lim, lim)
-        ax1.set_zlim3d(-lim, lim)
+        ax1.set_ylim3d(0.1, lim)
+        ax1.set_xlim3d(-0.02, 0.0)
+        ax1.set_zlim3d(0, 0.1)
         ax1.set_xlabel('Z')
         ax1.set_ylabel('X')
         ax1.set_zlabel('Y')
@@ -290,29 +327,107 @@ class Geometry:
 
         colors = ['0.6', '0.5', '0.2', 'c', 'm', 'y']
         # for i, (z, zdir) in enumerate(product([self.lightsource_distance, self.lightsource_distance+0.3], ['x', 'y', 'z'])):
-        side = Rectangle((self.lightsource_distance, -0.01+self.lightsource_x), 0.1, 0.02, facecolor=colors[0])
-        ax1.add_patch(side)
-        pathpatch_2d_to_3d(side, z=0.01+self.lightsource_x, zdir='z')
+        # side = Rectangle((self.lightsource_distance, -0.01+self.lightsource_x), 0.1, 0.02, facecolor=colors[0])
+        # ax1.add_patch(side)
+        # pathpatch_2d_to_3d(side, z=0.01+self.lightsource_x, zdir='z')
+        #
+        # side = Rectangle((self.lightsource_distance, -0.01+self.lightsource_x), 0.1, 0.02, facecolor=colors[0])
+        # ax1.add_patch(side)
+        # pathpatch_2d_to_3d(side, z=-0.01+self.lightsource_x, zdir='z')
+        #
+        # side = Rectangle((self.lightsource_distance, -0.01+ self.lightsource_y), 0.1, 0.02, facecolor=colors[1])
+        # ax1.add_patch(side)
+        # pathpatch_2d_to_3d(side, z=0.01+self.lightsource_x, zdir='y')
+        #
+        # side = Rectangle((self.lightsource_distance, -0.01 + self.lightsource_y), 0.1, 0.02, facecolor=colors[1])
+        # ax1.add_patch(side)
+        # pathpatch_2d_to_3d(side, z=-0.01+self.lightsource_x, zdir='y')
+        #
+        # side = Rectangle((-0.01+self.lightsource_x, -0.01+ self.lightsource_y), 0.02, 0.02, facecolor=colors[1])
+        # ax1.add_patch(side)
+        # pathpatch_2d_to_3d(side, z=self.lightsource_distance, zdir='x')
+        #
+        # side = Rectangle((-0.01 + self.lightsource_x, -0.01 + self.lightsource_y), 0.02, 0.02, facecolor=colors[1])
+        # ax1.add_patch(side)
+        # pathpatch_2d_to_3d(side, z=self.lightsource_distance+0.1, zdir='x')
+        logfile = open('lines3.txt', 'r')
 
-        side = Rectangle((self.lightsource_distance, -0.01+self.lightsource_x), 0.1, 0.02, facecolor=colors[0])
-        ax1.add_patch(side)
-        pathpatch_2d_to_3d(side, z=-0.01+self.lightsource_x, zdir='z')
+        d = 0
+        z0 = []
+        x1 = []
+        y1 = []
+        z1 = []
+        x2 = 0
+        y2 = 0
+        z2 = 0
+        x3 = []
+        y3 = []
+        z3 = []
+        dist = []
+        angleTh = []
+        angle = []
+        nangleTh = []
+        nangle = []
 
-        side = Rectangle((self.lightsource_distance, -0.01+ self.lightsource_y), 0.1, 0.02, facecolor=colors[1])
-        ax1.add_patch(side)
-        pathpatch_2d_to_3d(side, z=0.01+self.lightsource_x, zdir='y')
+        for line in logfile:
+            if line.startswith('Starting position w.r.t. camera front:'):
+                data = line.split(' ')[5].split('=')[1].split(',')
+                # x1 = float(data[0])
+                # y1 = float(data[1])
+                # z1 = float(data[2])
+                x1.append(float(data[0]))
+                y1.append(float(data[1]))
+                z1.append(float(data[2]))
+            if line.startswith('Distance of emission point'):
+                # z0 = float(line.split(' ')[5])
+                z0.append(float(line.split(' ')[5]))
+            if line.startswith('Return: '):
+                data = line.split(' ')
+                data2 = [x for x in data if x]
+                # print(data2)
+                # exit()
+                x2 = float(data2[1])
+                y2 = float(data2[2])
+                z2 = float(data2[3])
 
-        side = Rectangle((self.lightsource_distance, -0.01 + self.lightsource_y), 0.1, 0.02, facecolor=colors[1])
-        ax1.add_patch(side)
-        pathpatch_2d_to_3d(side, z=-0.01+self.lightsource_x, zdir='y')
+                # ax0.plot([0,x1], [0,y1], [z0,z1], color='r')
+                # ax0.plot([x1,x2], [y1,y2], [z1,z2], color='r')
+                # ax0.scatter(x2,y2,z2, color='k', marker='.')
+                # plt.pause(0.001)
+            if line.startswith('Camera 1 (custom):'):
+                if 'ipix=-1' in line:
+                    # x3.append(0)
+                    # y3.append(0)
+                    # z3.append(0)
+                    # dist.append(0)
+                    # angleTh.append(0)
+                    # nangleTh.append(0)
+                    continue
+                else:
+                    z3.append(x2/100)
+                    y3.append(y2/100)
+                    x3.append(z2/100)
+                    d = np.sqrt(x2 ** 2 + y2 ** 2)
+                    dist.append(d)
+                    angleTh.append(
+                        90 + np.rad2deg(np.arcsin(d / 100) - np.arctan((155.2 + np.sqrt(100 ** 2 + d ** 2)) / d)))
+                    nangleTh.append(np.rad2deg(np.arcsin(d / 100)))
+            if line.startswith('  Angle to normal to focal surface'):
+                angle.append(float(line.split(' ')[8]))
 
-        side = Rectangle((-0.01+self.lightsource_x, -0.01+ self.lightsource_y), 0.02, 0.02, facecolor=colors[1])
-        ax1.add_patch(side)
-        pathpatch_2d_to_3d(side, z=self.lightsource_distance, zdir='x')
+            if line.startswith('  Angle to normal to focal plane'):
+                nangle.append(float(line.split(' ')[8]))
 
-        side = Rectangle((-0.01 + self.lightsource_x, -0.01 + self.lightsource_y), 0.02, 0.02, facecolor=colors[1])
-        ax1.add_patch(side)
-        pathpatch_2d_to_3d(side, z=self.lightsource_distance+0.1, zdir='x')
+            if len(x3) > 10000: break
+            # angleTh.append(90-np.rad2deg(np.arcsin(d / 100) - np.arctan((155.2 + np.sqrt(100 ** 2 + d ** 2)) / d)))
+        # ax0.scatter(x3,y3, color='k', marker='.')
+        # print(len(angleTh), len(angle))
+        # ax1.scatter(angle, angleTh, color='C0')
+        # ax1.scatter(nangle, nangleTh, color='C1')
+        # plt.ylabel('Theoretical Angle')
+        # plt.xlabel('simtel value')
+        # print(x3)
+        # ax1.scatter(x3 , y3 , z3 , color='k', marker='.')
 
         self.plot_values3d()
 
@@ -395,112 +510,133 @@ class Geometry:
             xc = self.geom.pix_x[ipix].value
             yc = self.geom.pix_y[ipix].value
 
-            verts2d.append(self.get_2dverts(xc, yc))
-            verts3d.append(self.get_3dverts(xc, yc))
+            if xc>0.1 and yc>0:
+                verts2d.append(self.get_2dverts(xc, yc))
+                verts3d.append(self.get_3dverts(xc, yc))
 
-            if self.pixel_mask[ipix] == 0:
-                self.total_scale[ipix] = 0
-                scale2.append(0)
-                area2.append(0)
-                continue
+                if self.pixel_mask[ipix] == 0:
+                    self.total_scale[ipix] = 0
+                    scale2.append(0)
+                    area2.append(0)
+                    continue
 
-            area = self.get_pixel_scaledarea(xc, yc)
-            scale = self.get_pixel_angscale(xc, yc)
-            scale2.append(scale)
-            area2.append(area)
-            self.total_scale[ipix] = area*scale
+                area = self.get_pixel_scaledarea(xc, yc)
+                scale = self.get_pixel_angscale(xc, yc)
+                scale2.append(scale)
+                area2.append(area)
+                self.total_scale[ipix] = area*scale
 
         if plot:
             self.plot3dcamera(verts3d)
-            self.plot2dscales(verts2d, area2, scale2)
+            # self.plot2dscales(verts2d, area2, scale2)
 
         return 0
+
+# plt.ion()
+
+def rotation_matrix(d):
+    sin_angle = np.linalg.norm(d)
+    if sin_angle == 0:return np.identity(3)
+    d /= sin_angle
+    eye = np.eye(3)
+    ddt = np.outer(d, d)
+    skew = np.array([[    0,  d[2],  -d[1]],
+                  [-d[2],     0,  d[0]],
+                  [d[1], -d[0],    0]], dtype=np.float64)
+
+    M = ddt + np.sqrt(1 - sin_angle**2) * (eye - ddt) + sin_angle * skew
+    return M
+
+def plot_vector(fig, orig, v, color='blue'):
+   ax = fig.gca(projection='3d')
+   orig = np.array(orig); v=np.array(v)
+   ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
+   ax.set_xlim(0,10);ax.set_ylim(0,10);ax.set_zlim(0,10)
+   ax = fig.gca(projection='3d')
+   return fig
+
+def pathpatch_2d_to_3d(pathpatch, z, normal):
+    if type(normal) is str: #Translate strings to normal vectors
+        index = "xyz".index(normal)
+        normal = np.roll((1.0,0,0), index)
+
+    normal /= np.linalg.norm(normal) #Make sure the vector is normalised
+    path = pathpatch.get_path() #Get the path and the associated transform
+    trans = pathpatch.get_patch_transform()
+
+    path = trans.transform_path(path) #Apply the transform
+
+    pathpatch.__class__ = art3d.PathPatch3D #Change the class
+    pathpatch._code3d = path.codes #Copy the codes
+    pathpatch._facecolor3d = pathpatch.get_facecolor #Get the face color
+
+    verts = path.vertices #Get the vertices in 2D
+
+    d = np.cross(normal, (0, 0, 1)) #Obtain the rotation vector
+    M = rotation_matrix(d) #Get the rotation matrix
+
+    pathpatch._segment3d = np.array([np.dot(M, (x, y, 0)) + (0, 0, z) for x, y in verts])
+
+def pathpatch_translate(pathpatch, delta):
+    pathpatch._segment3d += delta
+    return pathpatch
+
+def plot_plane(ax, g,  point, normal, size=10, color='y'):
+#    p = Circle((0, 0), size, facecolor = color, alpha = .2)
+    p = Rectangle((0-g.pix_size/2,0-g.pix_size/2), width =g.pix_size , height =g.pix_size)
+    ax.add_patch(p)
+    pathpatch_2d_to_3d(p, z=0, normal=normal)
+    pathp = pathpatch_translate(p, (point[0], point[1], point[2]))
+    return pathp
+
+
+# def transform(x, y, z):
+
+
 
 
 def main():
 
-    print('WARNING THIS NEEDS WORK, mostly hardcoded')
-    parser = argparse.ArgumentParser(description='Get number of photons for LightEmission package for a requested p.e. per pixel')
-    parser.add_argument('--runfile', help='Path to runfile that contains run number and requested/estimated p.e.')
-    parser.add_argument('--outfile', help='file to write out data', default=None)
-    parser.add_argument('--pdefile', help='Path to PDE file, used to obtain efficiency at given wavelength')
-    parser.add_argument('--transmission', help='Path to additional transmission file, used to obtain efficiency at given wavelength', default=None)
-    parser.add_argument('--wavelength', default=405, type=float, help='wavelength of lightsource used')
-    parser.add_argument('--camera', default="CHEC", help='ctapipe camera geometery to use')
-    parser.add_argument('--ls_distance', default=1, type=float, help='distance of lightsource to camera focal plane [m]')
-    parser.add_argument('--angular_distribution', default="ang_dist_2.dat", help='file containing angular distribution')
-    args = parser.parse_args()
+    geo = Geometry()
 
-    # To convert range of desired pe to Lightsource values
-    try:
-        fl = np.loadtxt(args.runfile, unpack=True)
-        pe = fl[3]
-        run = fl[0]
-    except OSError:
-        pe = [float(args.runfile)]
-        run =[1]
 
-    out=None
-    if args.outfile != None:
-        out = open(args.outfile, 'w')
-        out.write('#run_number fw_pos fw_atten pe_expected ph_required n_events\n')
-    ph = []
-    pe2 =[]
-    # run = []
+    fig1 = plt.figure(1)
+    ax1 = fig1.add_subplot(111,projection='3d')
+    tile_x = np.array([])
+    tile_y = np.array([])
+    tile_d =  49.8/100
+    tile_gap = 0.2/100
+    pixel_d = 6.0/100
+    pixel_gap = 0.2/100
 
-    pde = np.loadtxt(args.pdefile,unpack=True)
-    fpde = interp1d(pde[0], pde[1])
-    if args.transmission != None:
-        trans = np.loadtxt(args.transmission, unpack=True)
-        ftrans = interp1d(trans[0], trans[1])
+    tile_verts = []
 
-        tote_trans = fpde(args.wavelength) * ftrans(args.wavelength)
-    else:
-        tote_trans = fpde(args.wavelength)
+    for y in range(6):
+        for x in range(6):
+            tile_x = np.append(tile_x, x*tile_d + x*tile_gap)
+            tile_y = np.append(tile_y, y*tile_d + y*tile_gap)
+    tile_x = np.delete((tile_x - np.mean(tile_x))[1:-1], [4,29])
+    tile_y = np.delete((tile_y - np.mean(tile_y))[1:-1], [4,29])
+    tile_z = np.zeros(len(tile_x))
 
-    # print(tote_trans)
-    # exit()
+    for i in range(len(tile_x)):
+        tile_verts.append(geo.get_3dverts(tile_x[i], tile_y[i], s=tile_d))
 
-    g = Geometry()
-    g.lightsource_distance = args.ls_distance
-    g.ang_dist_file_string = args.angular_distribution
-    g.camera = args.camera
-    g.setup_geom()
-    # pe = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 35, 37, 40, 43, 46, 49, 53, 57, 61, 65, 70, 75, 81, 86, 93, 100, 107, 114, 123, 132, 141, 151, 162, 174, 187, 200, 215, 231, 247, 265, 284, 305, 327, 351, 376, 403, 432, 464, 497, 533, 572, 613, 657, 705, 756, 811, 869, 932, 1000]
-    # pe = [   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   12, 14,   16,   19,   22,   25,   29,   33,   39,   44,   51,   59, 68,   79,   91,  104,  120,  138,  159,  184,  212,  244,  281, 323,  372,  429,  494,  568,  655,  754,  868, 1000]
+    print(tile_verts)
 
-    try:
-        for n,i in enumerate(pe):
-            # g.required_pe = i
-            photons = g.set_illumination(i, tote_trans)
-            # print(i, ' ', photons)
-            ph.append(round(photons,2))
-            pe2.append(round(i,2))
-            # run.append(int(fl[0][n]))
-            # g.getscale(plot=False)
-            if args.outfile != None:
-                out.write('%s\t%s\t%s\t%s\t%s\t%s\n' % (int(fl[0][n]),int(fl[1][n]),fl[2][n],fl[3][n],round(photons,2),int(fl[4][n])))
-    except TypeError:
-        # g.required_pe = i
-        photons = g.set_illumination(pe, tote_trans)
-        # print(i, ' ', photons)
-        ph.append(round(photons, 2))
-        pe2.append(round(pe, 2))
-        # run.append(int(fl[0][n]))
-        # g.getscale(plot=False)
-        if args.outfile != None:
-            out.write('%s\t%s\t%s\t%s\t%s\t%s\n' % (
-            int(fl[0][n]), int(fl[1][n]), fl[2][n], fl[3][n], round(photons, 2), int(fl[4][n])))
+    poly3d = Poly3DCollection(tile_verts)
+    # if not scale:
+    #     poly3d.set_array(np.array(self.total_scale) / max(self.total_scale))
+    # else:
+    #     poly3d.set_array(np.array(scale) / max(scale))
+    ax1.add_collection3d(poly3d)
 
-    print('number of requested photoelectrons')
-    print(pe2)
-    print('number of required emitted photons')
-    print(ph)
-    print('Run number')
-    print(run)
-
-    g.getscale(plot=True)
+    ax1.set_ylim(min(tile_y), max(tile_y))
+    ax1.set_xlim(min(tile_y), max(tile_y))
+    ax1.set_zlim(-3, 0)
+    # plt.scatter(tile_x, tile_y, tile_z)
     plt.show()
+
 
 if __name__ == '__main__':
     main()

@@ -32,6 +32,8 @@ class TriggerEffiencyGenerator(Tool):
 
     use_true_pe = Bool(False, "Use true mc p.e.").tag(config=True)
 
+    run_list_file = Unicode(None,help='Path to runlist used for simulation').tag(config=True)
+
 
     aliases = Dict(dict(input_path='TriggerEffiencyGenerator.input_path',
                         output_name='TriggerEffiencyGenerator.output_name',
@@ -69,7 +71,10 @@ class TriggerEffiencyGenerator(Tool):
 
 
     def start(self):
-        run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
+        if self.run_list_file==None:
+            run_list = np.loadtxt('%s/../runlist.txt' % self.input_path, unpack=True)
+        else:
+            run_list = np.loadtxt(self.run_list_file, unpack=True)
         file_list = listdir('%s' % self.input_path)
         file_list.sort()
         plot_cam = False
