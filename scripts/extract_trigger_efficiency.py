@@ -42,7 +42,8 @@ class TriggerEffiencyGenerator(Tool):
                         radius='CameraDL1Calibrator.radius',
                         T='TriggerEffiencyGenerator.telescopes',
                         plot_cam='TriggerEffiencyGenerator.plot_cam',
-                        use_true_pe='TriggerEffiencyGenerator.use_true_pe'
+                        use_true_pe='TriggerEffiencyGenerator.use_true_pe',
+                        run_list_file='TriggerEffiencyGenerator.run_list_file'
                         ))
     classes = List([EventSourceFactory,
                     CameraDL1Calibrator,
