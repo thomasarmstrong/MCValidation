@@ -1,3 +1,20 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ @thomasarmstrong Sign out
+1
+0 1 thomasarmstrong/MCValidation
+ Code  Issues 4  Pull requests 0  Projects 0  Wiki  Insights  Settings
+MCValidation/configs/checs_pixel_mapping_fixedgainvar.dat
+934148f  on 11 Jul
+@thomasarmstrong thomasarmstrong test flat fielding
+     
+2600 lines (2595 sloc)  213 KB
 # PixType format:
 # Par.  1: pixel type (here always 1)
 #       2: PMT type (must be 0)

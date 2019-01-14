@@ -4,6 +4,10 @@ from tqdm import tqdm
 from ctapipe.io import event_source
 import argparse
 from ctapipe.io.eventsourcefactory import EventSourceFactory
+from scipy.optimize import curve_fit
+from scipy import asarray as ar,exp
+from scipy.interpolate import UnivariateSpline
+import numpy as np
 
 parser = argparse.ArgumentParser(description='Run LightEmission and simtel')
 parser.add_argument('--mcfile', default=None, help='Path to mc data file')
@@ -41,6 +45,10 @@ if args.labfile is not None and args.mcfile is not None:
     ax2.set_ylabel('amplitude')
     ax2.set_xlabel('time [ns]')
 
+def gaus(x, a, x0, sigma):
+    return a*exp(-(x-x0)**2/(2*sigma**2))
+
+
 ######### CAMERA DATA p.e. ###########
 
 
@@ -59,14 +67,38 @@ try:
                         if args.lab_thresh==None:
                             ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe,
                                      color='C0')
+                            n=len(event_r1.r1.tel[tel].waveform[0][0])
+                            mean = sum(range(len(event_r1.r1.tel[tel].waveform[0][0])) * (event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe))/n
+                            sigma = sum((event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe)* (range(len(event_r1.r1.tel[tel].waveform[0][0]))-mean)**2 )/n
+                            popt, pcov = curve_fit(gaus, range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe, p0=[1, mean, sigma])
+                            ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), gaus(range(len(event_r1.r1.tel[tel].waveform[0][0])), *popt))
+                            spline = UnivariateSpline(range(len(event_r1.r1.tel[tel].waveform[0][0])), gaus(range(len(event_r1.r1.tel[tel].waveform[0][0])), *popt) -np.max(gaus(range(len(event_r1.r1.tel[tel].waveform[0][0])), *popt))/2, s=0)
+                            r1, r2 = spline.roots()
+                            ax1.axvspan(r1,r2, facecolor='g', alpha=0.5)
                         else:
                             if max(event_r1.r1.tel[tel].waveform[0][i])/args.mv2pe > args.lab_thresh:
                                 print('plotting only lab pixel: ', i)
                                 ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe,color='C0')
+                                n=len(event_r1.r1.tel[tel].waveform[0][0])
+                                mean = sum(range(len(event_r1.r1.tel[tel].waveform[0][0])) * (event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe))/n
+                                sigma = sum((event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe)* (range(len(event_r1.r1.tel[tel].waveform[0][0]))-mean)**2 )/n
+       	       	       	        popt, pcov = curve_fit(gaus, range(len(event_r1.r1.tel[tel].waveform[0][0])), event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe, p0=[1, mean, sigma])
+       	       	       	        ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])), gaus(range(len(event_r1.r1.tel[tel].waveform[0][0])), *popt))
+                                spline = UnivariateSpline(range(len(event_r1.r1.tel[tel].waveform[0][0])), gaus(range(len(event_r1.r1.tel[tel].waveform[0][0])), *popt) -np.max(gaus(range(len(event_r1.r1.tel[tel].waveform[0][0])), *popt))/2, s=0)
+                                r1, r2 = spline.roots()
+                                ax1.axvspan(r1,r2, facecolor='g', alpha=0.5)
                 else:
                     ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][0])),
                              event_r1.r1.tel[tel].waveform[0][args.lab_pix] / args.mv2pe,
                              color='C0')
+                    n=len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])
+                    mean = sum(range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])) * (event_r1.r1.tel[tel].waveform[0][args.lab_pix]/args.mv2pe))/n
+                    sigma = sum((event_r1.r1.tel[tel].waveform[0][i]/args.mv2pe)* (range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix]))-mean)**2 )/n
+                    popt, pcov = curve_fit(gaus, range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])), event_r1.r1.tel[tel].waveform[0][args.lab_pix]/args.mv2pe, p0=[1, mean, sigma])
+                    ax1.plot(range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])), gaus(range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])), *popt))
+       	       	    spline = UnivariateSpline(range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])), gaus(range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])), *popt) -np.max(gaus(range(len(event_r1.r1.tel[tel].waveform[0][args.lab_pix])), *popt))/2, s=0)
+       	       	    r1, r2 = spline.roots()
+       	       	    ax1.axvspan(r1,r2, facecolor='g', alpha=0.5)
 
 except FileNotFoundError:
     print('LAB file_not_found')
@@ -89,13 +121,37 @@ try:
                     for i in range(0,args.max_pix ):
                         if args.mc_thresh == None:
                             ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i],color='C1')
+                            n=len(event_mc2.r1.tel[tel].waveform[0][0])
+                            mean = sum(range(len(event_mc2.r1.tel[tel].waveform[0][0])) * (event_mc2.r1.tel[tel].waveform[0][i]))/n
+                            sigma = sum((event_mc2.r1.tel[tel].waveform[0][i])* (range(len(event_mc2.r1.tel[tel].waveform[0][0]))-mean)**2 )/n
+                            #popt, pcov = curve_fit(gaus, range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i], p0=[1, mean, sigma])
+                            #ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), gaus(range(len(event_mc2.r1.tel[tel].waveform[0][0])), *popt))
+                            #spline = UnivariateSpline(range(len(event_mc2.r1.tel[tel].waveform[0][0])), gaus(range(len(event_mc2.r1.tel[tel].waveform[0][0])), *popt) -np.max(gaus(range(len(event_mc2.r1.tel[tel].waveform[0][0])), *popt))/2, s=0)
+                            #r1, r2 = spline.roots()
+                            #ax2.axvspan(r1,r2, facecolor='g', alpha=0.5)
                         else:
                             if max(event_mc2.r1.tel[tel].waveform[0][i])>args.mc_thresh:
                                 print('plotting only mc pixel: ', i)
                                 ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i],color='C1')
+                                n=len(event_mc2.r1.tel[tel].waveform[0][0])
+                                mean = sum(range(len(event_mc2.r1.tel[tel].waveform[0][0])) * (event_mc2.r1.tel[tel].waveform[0][i]))/n
+                                sigma = sum((event_mc2.r1.tel[tel].waveform[0][i])* (range(len(event_mc2.r1.tel[tel].waveform[0][0]))-mean)**2 )/n
+                                #popt, pcov = curve_fit(gaus, range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][i], p0=[1, mean, sigma])
+                                #ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), gaus(range(len(event_mc2.r1.tel[tel].waveform[0][0])), *popt))
+                                #spline = UnivariateSpline(range(len(event_mc2.r1.tel[tel].waveform[0][0])), gaus(range(len(event_mc2.r1.tel[tel].waveform[0][0])), *popt) -np.max(gaus(range(len(event_mc2.r1.tel[tel].waveform[0][0])), *popt))/2, s=0)
+                                #r1, r2 = spline.roots()
+                                #ax2.axvspan(r1,r2, facecolor='g', alpha=0.5)
                 else:
                     ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][0])), event_mc2.r1.tel[tel].waveform[0][args.mc_pix],
                              color='C1')
+                    n=len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])
+                    mean = sum(range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])) * (event_mc2.r1.tel[tel].waveform[0][args.mc_pix]))/n
+                    sigma = sum((event_mc2.r1.tel[tel].waveform[0][args.mc_pix])* (range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix]))-mean)**2 )/n
+                    #popt, pcov = curve_fit(gaus, range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])), event_mc2.r1.tel[tel].waveform[0][args.mc_pix], p0=[1, mean, sigma])
+                    #ax2.plot(range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])), gaus(range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])), *popt))
+                    #spline = UnivariateSpline(range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])), gaus(range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])), *popt) -np.max(gaus(range(len(event_mc2.r1.tel[tel].waveform[0][args.mc_pix])), *popt))/2, s=0)
+                    #r1, r2 = spline.roots()
+                    #ax2.axvspan(r1,r2, facecolor='g', alpha=0.5)
 
 except FileNotFoundError:
     print('MC file not found')
