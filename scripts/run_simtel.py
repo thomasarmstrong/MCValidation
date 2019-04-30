@@ -4,13 +4,14 @@ import numpy as np
 import multiprocessing
 
 ## Hardcoded parameters:
-simtel_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-06-12_testing/sim_telarray'
-corsika_path = '/scratch/armstrongt/Software/CTA/CorsikaSimtel/2018-06-12_testing/corsika-6990/run'
+simtel_path = '/home/armstrongt/Software/CTA/CorsikaSimtel/2018-11-07/sim_telarray'
+corsika_path = '/home/armstrongt/Software/CTA/CorsikaSimtel/2018-11-07/corsika-6990/run'
 lightEmission_path = '/scratch/armstrongt/Workspace/CTA/MCValidation/src/LightEmission-pkg'
 
 
 
-def run_simtel(outfile='../data/bypass2_enoise.simtel.gz', nsb=0.02, disc_thresh=230, extra_opts=' ',
+def run_simtel(outfile='../data/bypass2_enoise.simtel.gz', config,
+               nsb=0.02, disc_thresh=230, extra_opts=' ',
                infile='/scratch/armstrongt/Workspace/CTA/MCValidation/data/beamed_test.dat.gz'):
     """
     Simple helper script to launch sim_telarray (as with command line)
@@ -23,7 +24,7 @@ def run_simtel(outfile='../data/bypass2_enoise.simtel.gz', nsb=0.02, disc_thresh
     :return: None
     """
     os.system('%s/sim_telarray '
-              '-c /%s/cfg/CTA/CTA-ULTRA6-SST-GCT-S.cfg '
+              '-c %s '
               '-o %s '
               '-C BYPASS_OPTICS=2 '
               '-C NIGHTSKY_BACKGROUND=all:%s '
@@ -35,7 +36,8 @@ def run_simtel(outfile='../data/bypass2_enoise.simtel.gz', nsb=0.02, disc_thresh
               '%s '
               '-I%s/cfg/CTA/ '
               '-I%s '
-              '%s' % (simtel_path, simtel_path, outfile, nsb, disc_thresh, extra_opts, simtel_path, corsika_path, infile))
+              '-I/home/armstrongt/CHECMC/CHEConASTRI/SimTelarray/astri_chec_v002/ '
+              '%s' % (simtel_path, config, outfile, nsb, disc_thresh, extra_opts, simtel_path, corsika_path, infile))
 
 
 def run_lightemission(events=3, photons=10946249, distance=100, cam_radius=30, xdisp=0, ydisp=0, spectrum=405,
@@ -101,17 +103,17 @@ def run_corsika_simtel(params):
         print("@@@@ Running Simtelarray\n\n")
         if args.discthresh == "File":
             if args.nsb == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=infile[6][n], disc_thresh=infile[7][n],
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=infile[6][n], disc_thresh=infile[7][n],
                            extra_opts=args.extra_opts)
             else:
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7][n],
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=args.nsb, disc_thresh=infile[7][n],
                            extra_opts=args.extra_opts)
         else:
             if args.nsb == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=infile[6][n], disc_thresh=args.discthresh,
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=infile[6][n], disc_thresh=args.discthresh,
                            extra_opts=args.extra_opts)
             else:
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=args.nsb, disc_thresh=args.discthresh,
                            extra_opts=args.extra_opts)
     return ('run%04d.simtel.gz' % int(infile[0][n]), 0 )
 
@@ -144,17 +146,17 @@ def run_corsika_simtel_noloop(args, infile):
         print("@@@@ Running Simtelarray\n\n")
         if args.discthresh == "File":
             if args.nsb == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=infile[7],
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=infile[6], disc_thresh=infile[7],
                            extra_opts=args.extra_opts)
             else:
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=infile[7],
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=args.nsb, disc_thresh=infile[7],
                            extra_opts=args.extra_opts)
         else:
             if args.nsb == "File":
-                run_simtel(infile=infl, outfile=outfl, nsb=infile[6], disc_thresh=args.discthresh,
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=infile[6], disc_thresh=args.discthresh,
                            extra_opts=args.extra_opts)
             else:
-                run_simtel(infile=infl, outfile=outfl, nsb=args.nsb, disc_thresh=args.discthresh,
+                run_simtel(infile=infl, outfile=outfl, config=args.cfg, nsb=args.nsb, disc_thresh=args.discthresh,
                            extra_opts=args.extra_opts)
     return 0
 

@@ -29,6 +29,18 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
 
+def focal_plane(x):
+    x=10*x
+    p2 = -5.0e-3
+    p4 = -1.25e-7
+    p6 = -6.25e-12
+    p8 = -3.90625e-16
+    p10 = -2.734375e-20
+    # return 0
+    return (p2 *x**2 + p4 *x**4 + p6 *x**6 + p8 *x **8 +  p10 *x**10)/10.0
+
+
+
 PIXEL_EPSILON = 0.0002
 
 def focal_plane(x):
@@ -590,39 +602,47 @@ def plot_plane(ax, g,  point, normal, size=10, color='y'):
     return pathp
 
 
-# def transform(x, y, z):
-
-
 
 
 def main():
 
-    geo = Geometry()
+    modules = np.array([[2.560, 2.560], [2.560, -2.760], [2.560, 7.880], [2.560, -8.080], [2.560, 13.200],
+                        [2.560, -13.400], [-2.760, 2.560], [-2.760, -2.760], [-2.760, 7.880], [-2.760, -8.080],
+                        [-2.760, 13.200], [-2.760, -13.400], [7.880, 2.560], [7.880, -2.760], [7.880, 7.880],
+                        [7.880, -8.080],
+                        [7.880, 13.200], [7.880, -13.400], [-8.080, 2.560], [-8.080, -2.760], [-8.080, 7.880],
+                        [-8.080, -8.080],
+                        [-8.080, 13.200], [-8.080, -13.400], [13.200, 2.560], [13.200, -2.760], [13.200, 7.880],
+                        [13.200, -8.080],
+                        [-13.400, 2.560], [-13.400, -2.760], [-13.400, 7.880], [-13.400, -8.080]])
 
+    print(modules.T)
+    geo = Geometry()
+    modules = modules.T
 
     fig1 = plt.figure(1)
     ax1 = fig1.add_subplot(111,projection='3d')
-    tile_x = np.array([])
-    tile_y = np.array([])
-    tile_d =  45.8/1000
+    tile_x = modules[0]/100
+    tile_y = modules[1]/100
+    tile_d =  49.8/1000
     tile_gap = 0.2/1000
     pixel_d = 6.0/1000
     pixel_gap = 0.2/1000
 
     tile_verts = []
 
-    for y in range(8):
-        for x in range(8):
-            tile_x = np.append(tile_x, x*tile_d + x*tile_gap)
-            tile_y = np.append(tile_y, y*tile_d + y*tile_gap)
-    tile_x = np.delete((tile_x - np.mean(tile_x))[1:-1], [6,55])
-    tile_y = np.delete((tile_y - np.mean(tile_y))[1:-1], [6,55])
+    # for y in range(8):
+    #     for x in range(8):
+    #         tile_x = np.append(tile_x, x*tile_d + x*tile_gap)
+    #         tile_y = np.append(tile_y, y*tile_d + y*tile_gap)
+    # tile_x = np.delete((tile_x - np.mean(tile_x))[1:-1], [6,55])
+    # tile_y = np.delete((tile_y - np.mean(tile_y))[1:-1], [6,55])
     tile_z = np.zeros(len(tile_x))
 
     for i in range(len(tile_x)):
         tile_verts.append(geo.get_3dverts(tile_x[i], tile_y[i], s=tile_d))
 
-    print(tile_verts)
+    # print(tile_verts)
 
     poly3d = Poly3DCollection(tile_verts)
     # if not scale:
